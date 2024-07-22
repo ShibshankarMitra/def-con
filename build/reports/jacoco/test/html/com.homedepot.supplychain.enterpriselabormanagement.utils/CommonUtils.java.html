@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommonUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnterpriseLaborManagement</a> &gt; <a href="index.source.html" class="el_package">com.homedepot.supplychain.enterpriselabormanagement.utils</a> &gt; <span class="el_source">CommonUtils.java</span></div><h1>CommonUtils.java</h1><pre class="source lang-java linenums">package com.homedepot.supplychain.enterpriselabormanagement.utils;
+
+import com.homedepot.supplychain.enterpriselabormanagement.constants.CommonConstants;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+
+public final class CommonUtils {
+    private CommonUtils() {
+        //util class
+    }
+    public static BigDecimal calculateVolume(BigDecimal length, BigDecimal width, BigDecimal height){
+<span class="fc" id="L16">        return length.multiply(width).multiply(height);</span>
+    }
+
+    public static String getDateFromTimeStampString(String date) {
+<span class="fc" id="L20">        LocalDateTime localDateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(CommonConstants.BIG_QUERY_DATETIME_FORMAT));</span>
+<span class="fc" id="L21">        return localDateTime.format(DateTimeFormatter.ofPattern(CommonConstants.BIG_QUERY_DATE_FORMAT));</span>
+    }
+
+    public static String getTimeStampToBqFormat(String date){
+<span class="fc" id="L25">        LocalDateTime localDateTime = LocalDateTime.parse(date);</span>
+<span class="fc" id="L26">        return localDateTime.format(DateTimeFormatter.ofPattern(CommonConstants.BIG_QUERY_DATETIME_FORMAT));</span>
+    }
+
+    public static String getCurrentTimeStampToBqFormat(){
+<span class="fc" id="L30">        return LocalDateTime.now(ZoneOffset.UTC)</span>
+<span class="fc" id="L31">                .format(DateTimeFormatter.ofPattern(CommonConstants.BIG_QUERY_DATETIME_FORMAT));</span>
+    }
+
+    public static String getRandomUuid(){
+<span class="fc" id="L35">        return UUID.randomUUID().toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

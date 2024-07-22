@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PubSubConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnterpriseLaborManagement</a> &gt; <a href="index.source.html" class="el_package">com.homedepot.supplychain.enterpriselabormanagement.configs</a> &gt; <span class="el_source">PubSubConfig.java</span></div><h1>PubSubConfig.java</h1><pre class="source lang-java linenums">package com.homedepot.supplychain.enterpriselabormanagement.configs;
+
+import com.google.api.gax.batching.FlowControlSettings;
+import com.google.cloud.spring.autoconfigure.pubsub.GcpPubSubAutoConfiguration;
+import com.google.cloud.spring.core.GcpProjectIdProvider;
+import com.google.cloud.spring.pubsub.core.PubSubConfiguration;
+import com.google.cloud.spring.pubsub.core.subscriber.PubSubSubscriberTemplate;
+import com.google.cloud.spring.pubsub.integration.AckMode;
+import com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter;
+import com.google.cloud.spring.pubsub.support.BasicAcknowledgeablePubsubMessage;
+import com.google.cloud.spring.pubsub.support.DefaultSubscriberFactory;
+import com.google.cloud.spring.pubsub.support.GcpPubSubHeaders;
+import com.homedepot.supplychain.enterpriselabormanagement.constants.CommonConstants;
+import com.homedepot.supplychain.enterpriselabormanagement.services.PubSubConsumerService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.channel.DirectChannel;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandler;
+
+<span class="fc" id="L28">@Slf4j</span>
+@Configuration
+@Import({GcpPubSubAutoConfiguration.class})
+<span class="fc" id="L31">public class PubSubConfig {</span>
+
+    /**
+     * This is the Custom @Configuration class for subscriber.
+     */
+    @Value(&quot;${spring.cloud.gcp.project-id}&quot;)
+    private String projectId;
+
+    @Value(&quot;${elm.gcp.pubsub.elm-transactions-subscription-name}&quot;)
+    private String subscriptionName;
+
+    @Value(&quot;${elm.gcp.pubsub.subscriber.flow-control.max-outstanding-element-count}&quot;)
+    private String maxOutstandingElementCount;
+
+    @Value(&quot;${elm.gcp.pubsub.subscriber.flow-control.max-outstanding-request-bytes}&quot;)
+    private String maxOutstandingRequestBytes;
+    /**
+     * Creates a bean of type org.springframework.messaging.MessageChannel
+     */
+    @Bean
+    public MessageChannel pubsubInputChannel() {
+<span class="fc" id="L52">        return new DirectChannel();</span>
+    }
+
+    /**
+     * @param pubSubConfiguration (Provided by GcpPubSubAutoConfiguration class)
+     * @return customSubscriberFactory.
+     * This SubscriberFactory will have Flow Control settings embedded
+     */
+    @Bean
+    @Primary
+    public DefaultSubscriberFactory customSubscriberFactory(PubSubConfiguration pubSubConfiguration) {
+<span class="fc" id="L63">        GcpProjectIdProvider idProvider = () -&gt; projectId;</span>
+        FlowControlSettings flowControlSettings =
+<span class="fc" id="L65">                FlowControlSettings.newBuilder()</span>
+                        /*1,000 outstanding messages. Must be &gt;0. It controls   the maximum number of messages
+                        the subscriber receives before pausing the message stream.*/
+<span class="fc" id="L68">                        .setMaxOutstandingElementCount(Long.parseLong(maxOutstandingElementCount))</span>
+                        /*100 MiB. Must be &gt;0. It controls the maximum size of messages the subscriber
+                        receives before pausing the message stream.*/
+<span class="fc" id="L71">                        .setMaxOutstandingRequestBytes(Long.parseLong(maxOutstandingRequestBytes) * CommonConstants.BYTE_MULTIPLIER * CommonConstants.BYTE_MULTIPLIER)</span>
+<span class="fc" id="L72">                        .build();</span>
+<span class="fc" id="L73">        DefaultSubscriberFactory customSubscriberFactory = new DefaultSubscriberFactory(idProvider, pubSubConfiguration);</span>
+<span class="fc" id="L74">        customSubscriberFactory.setFlowControlSettings(flowControlSettings);</span>
+<span class="fc" id="L75">        return customSubscriberFactory;</span>
+    }
+
+    /**
+     * @return customPubSubSubscriberTemplate. This PubSubSubscriberTemplate will have customSubscriberFactory bean embedded
+     */
+    @Bean
+    @Primary
+    public PubSubSubscriberTemplate customPubSubSubscriberTemplate(@Qualifier(&quot;customSubscriberFactory&quot;) DefaultSubscriberFactory customSubscriberFactory) {
+<span class="fc" id="L84">        return new PubSubSubscriberTemplate(customSubscriberFactory);</span>
+    }
+
+    /**
+     * @return adapter
+     */
+    @Bean
+    public PubSubInboundChannelAdapter messageChannelAdapter(
+            @Qualifier(&quot;pubsubInputChannel&quot;) MessageChannel inputChannel, @Qualifier(&quot;customPubSubSubscriberTemplate&quot;) PubSubSubscriberTemplate customPubSubSubscriberTemplate) {
+<span class="fc" id="L93">        PubSubInboundChannelAdapter adapter = new PubSubInboundChannelAdapter(customPubSubSubscriberTemplate, subscriptionName);</span>
+        /* Setting the adapter output channel as message channel */
+<span class="fc" id="L95">        adapter.setOutputChannel(inputChannel);</span>
+        /* Setting the adapter ack mode as manual */
+<span class="fc" id="L97">        adapter.setAckMode(AckMode.MANUAL);</span>
+<span class="fc" id="L98">        return adapter;</span>
+    }
+
+    /**
+     * Providing the implementation for MessageHandler.handleMessage()-&gt; {}
+     */
+    @Bean
+    @ServiceActivator(inputChannel = &quot;pubsubInputChannel&quot;)
+    public MessageHandler messageReceiver(PubSubConsumerService pubSubConsumerService) {
+<span class="fc" id="L107">        return message -&gt; {</span>
+<span class="nc" id="L108">            BasicAcknowledgeablePubsubMessage originalMessage = message.getHeaders()</span>
+<span class="nc" id="L109">                    .get(GcpPubSubHeaders.ORIGINAL_MESSAGE, BasicAcknowledgeablePubsubMessage.class);</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">            if (!ObjectUtils.isEmpty(originalMessage)) {</span>
+                //Checked that the PubSub message is not Null
+<span class="nc" id="L112">                String messageId = originalMessage.getPubsubMessage().getMessageId();</span>
+<span class="nc" id="L113">                String messageBody = originalMessage.getPubsubMessage().getData().toStringUtf8();</span>
+<span class="nc" id="L114">                log.info(&quot;pubsubInputChannel: PubSub message received with ID: {} Payload: {}&quot;, messageId, messageBody);</span>
+                try {
+<span class="nc" id="L116">                    pubSubConsumerService.processPubSubToBq(messageId, messageBody, originalMessage);</span>
+<span class="nc" id="L117">                } catch (Exception ignored) {</span>
+                    //This is an empty catch block as exceptions are handled using aspect
+<span class="nc" id="L119">                }</span>
+            }
+<span class="nc" id="L121">        };</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

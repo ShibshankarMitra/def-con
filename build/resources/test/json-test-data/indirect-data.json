@@ -1,0 +1,20 @@
+{
+  "attributes": {
+    "schemaUrl": "<insert schema url>",
+    "contract_version": 0.1,
+    "source": "HDW",
+    "event_type": "INDIRECT",
+    "platform": "FDC",
+    "dc_number": "5865",
+    "action": "INDIRECT_BATTERY_CHANGE_LM",
+    "activity": "INDIRECT_BATTERY_CHANGE_LM",
+    "publish_timestamp": "2024-01-12T19:54:58.813",
+    "trace_id": "6e0ed4f6-00c8-4676-8a4a-529c0a713833"
+  },
+  "data": {
+    "user_id": "john_smith@homedepot.com",
+    "ldap_id": "stc9000",
+    "transaction_id": "ef23415ef78da234",
+    "transaction_timestamp": "2024-01-12T19:54:58.813"
+  }
+}

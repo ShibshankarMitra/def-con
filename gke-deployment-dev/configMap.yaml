@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  USER: ''
+  VERSION: ''
+
+kind: ConfigMap
+metadata:
+  name: ${artifact_name}-config
+  namespace: elm-integration

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Location.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnterpriseLaborManagement</a> &gt; <a href="index.source.html" class="el_package">com.homedepot.supplychain.enterpriselabormanagement.models.hdw</a> &gt; <span class="el_source">Location.java</span></div><h1>Location.java</h1><pre class="source lang-java linenums">package com.homedepot.supplychain.enterpriselabormanagement.models.hdw;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+@Getter
+<span class="fc" id="L10">@Setter</span>
+<span class="fc" id="L11">@NoArgsConstructor</span>
+public class Location {
+    @JsonProperty(&quot;transaction_timestamp&quot;)
+<span class="fc" id="L14">    private String transactionTimeStamp;</span>
+    @JsonProperty(&quot;start_location&quot;)
+<span class="fc" id="L16">    private String startLocation;</span>
+    @JsonProperty(&quot;end_location&quot;)
+<span class="fc" id="L18">    private String endLocation;</span>
+    @JsonProperty(&quot;start_zone&quot;)
+<span class="fc" id="L20">    private String startZone;</span>
+    @JsonProperty(&quot;end_zone&quot;)
+<span class="fc" id="L22">    private String endZone;</span>
+    @JsonProperty(&quot;start_location_type&quot;)
+<span class="fc" id="L24">    private String startLocationType;</span>
+    @JsonProperty(&quot;end_location_type&quot;)
+<span class="fc" id="L26">    private String endLocationType;</span>
+    @JsonProperty(&quot;pick_area&quot;)
+<span class="fc" id="L28">    private String pickArea;</span>
+    @JsonProperty(&quot;put_area&quot;)
+<span class="fc" id="L30">    private String putArea;</span>
+    @JsonProperty(&quot;skus&quot;)
+<span class="fc" id="L32">    private List&lt;Sku&gt; skus;</span>
+    @JsonProperty(&quot;location_uom&quot;)
+<span class="fc" id="L34">    private String locationUom;</span>
+    @JsonProperty(&quot;location_qty&quot;)
+<span class="fc" id="L36">    private double locationQty;</span>
+    @JsonProperty(&quot;uom_qty&quot;)
+<span class="fc" id="L38">    private double uomQty;</span>
+    @JsonProperty(&quot;reason_code&quot;)
+<span class="fc" id="L40">    private String reasonCode;</span>
+    @JsonProperty(&quot;inbound_outbound_indicator&quot;)
+<span class="fc" id="L42">    private String inboundOutboundIndicator;</span>
+    @JsonProperty(&quot;order_category&quot;)
+<span class="fc" id="L44">    private String orderCategory;</span>
+    @JsonProperty(&quot;shipment_number&quot;)
+<span class="fc" id="L46">    private String shipmentNumber;</span>
+    @JsonProperty(&quot;shipment_type_id&quot;)
+<span class="fc" id="L48">    private String shipmentTypeId;</span>
+    @JsonProperty(&quot;shipment_route&quot;)
+<span class="fc" id="L50">    private String shipmentRoute;</span>
+    @JsonProperty(&quot;shipment_stop&quot;)
+<span class="fc" id="L52">    private String shipmentStop;</span>
+    @JsonProperty(&quot;store_number&quot;)
+<span class="fc" id="L54">    private String storeNumber;</span>
+    @JsonProperty(&quot;service_type&quot;)
+<span class="fc" id="L56">    private String serviceType;</span>
+    @JsonProperty(&quot;vendor_number&quot;)
+<span class="fc" id="L58">    private String vendorNumber;</span>
+    @JsonProperty(&quot;trailer_number&quot;)
+<span class="fc" id="L60">    private String trailerNumber;</span>
+    @JsonProperty(&quot;rail_car_number&quot;)
+<span class="fc" id="L62">    private String railCarNumber;</span>
+    @JsonProperty(&quot;scac&quot;)
+<span class="fc" id="L64">    private String scac;</span>
+    @JsonProperty(&quot;lpn_status&quot;)
+<span class="fc" id="L66">    private String lpnStatus;</span>
+    @JsonProperty(&quot;shipment_lpn_error_type&quot;)
+<span class="fc" id="L68">    private String shipmentLpnErrorType;</span>
+    @JsonProperty(&quot;mhe_loaded&quot;)
+<span class="fc" id="L70">    private String mheLoaded;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

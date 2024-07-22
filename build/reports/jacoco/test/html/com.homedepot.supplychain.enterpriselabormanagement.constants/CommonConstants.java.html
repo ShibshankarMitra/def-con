@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommonConstants.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnterpriseLaborManagement</a> &gt; <a href="index.source.html" class="el_package">com.homedepot.supplychain.enterpriselabormanagement.constants</a> &gt; <span class="el_source">CommonConstants.java</span></div><h1>CommonConstants.java</h1><pre class="source lang-java linenums">package com.homedepot.supplychain.enterpriselabormanagement.constants;
+
+public final class CommonConstants {
+
+
+    //ELM APPLICATION CONSTANTS
+    public static final String FILE_PATH_DELIMITER=&quot;/&quot;;
+    public static final String JSON_SCHEMA_DIRECTORY =&quot;json-schema&quot;;
+    public static final String HDW_DIRECT_SCHEMA_FILE_NAME= &quot;hdw-transaction-direct-schema.json&quot;;
+    public static final String HDW_INDIRECT_SCHEMA_FILE_NAME= &quot;hdw-transaction-indirect-schema.json&quot;;
+    public static final String BIG_QUERY_DATETIME_FORMAT = &quot;yyyy-MM-dd'T'HH:mm:ss.SSSSSS&quot;;
+    public static final String BIG_QUERY_DATE_FORMAT = &quot;yyyy-MM-dd&quot;;
+    //PubSub Flow Control settings
+<span class="fc" id="L14">    public static final Integer BYTE_MULTIPLIER = 1024;</span>
+    //JSON paths
+    public static final String ATTRIBUTES_JSON_PATH = &quot;attributes&quot;;
+    public static final String EVENT_TYPE_JSON_PATH = &quot;event_type&quot;;
+    //Transaction Events constants
+    public static final String DIRECT_EVENT = &quot;DIRECT&quot;;
+    public static final String INDIRECT_EVENT = &quot;INDIRECT&quot;;
+    private CommonConstants() {
+        //Constant class
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

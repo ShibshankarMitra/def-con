@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PubSubConsumerService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnterpriseLaborManagement</a> &gt; <a href="index.source.html" class="el_package">com.homedepot.supplychain.enterpriselabormanagement.services</a> &gt; <span class="el_source">PubSubConsumerService.java</span></div><h1>PubSubConsumerService.java</h1><pre class="source lang-java linenums">package com.homedepot.supplychain.enterpriselabormanagement.services;
+
+import com.google.cloud.bigquery.BigQueryException;
+import com.google.cloud.spring.pubsub.support.BasicAcknowledgeablePubsubMessage;
+import com.homedepot.supplychain.enterpriselabormanagement.constants.ErrorMessages;
+import com.homedepot.supplychain.enterpriselabormanagement.exceptions.BigQueryResponseException;
+import com.homedepot.supplychain.enterpriselabormanagement.exceptions.ElmBusinessException;
+import com.homedepot.supplychain.enterpriselabormanagement.exceptions.ElmSystemException;
+import com.homedepot.supplychain.enterpriselabormanagement.exceptions.JsonValidationException;
+import com.homedepot.supplychain.enterpriselabormanagement.models.hdw.HdwTransaction;
+import com.homedepot.supplychain.enterpriselabormanagement.utils.JsonUtils;
+import com.homedepot.supplychain.enterpriselabormanagement.utils.RowMapperUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+import static com.homedepot.supplychain.enterpriselabormanagement.constants.CommonConstants.*;
+
+@Service
+<span class="fc" id="L24">@Slf4j</span>
+public class PubSubConsumerService {
+
+    private final ElmTransactionBigQueryService elmTransactionBigQueryService;
+
+    @Autowired
+<span class="fc" id="L30">    public PubSubConsumerService(ElmTransactionBigQueryService elmTransactionBigQueryService) {</span>
+<span class="fc" id="L31">        this.elmTransactionBigQueryService = elmTransactionBigQueryService;</span>
+<span class="fc" id="L32">    }</span>
+
+    public void processPubSubToBq(String messageId, String messageBody, BasicAcknowledgeablePubsubMessage originalMessage) {
+        //Reading pubSub Message to HdwTransaction
+        HdwTransaction hdwTransaction;
+        List&lt;Map&lt;String, Object&gt;&gt; rows;
+        try {
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">            if (!StringUtils.isBlank(messageBody)) {</span>
+<span class="fc" id="L40">                String eventType = JsonUtils.readJsonNode(messageBody,</span>
+                        FILE_PATH_DELIMITER+ATTRIBUTES_JSON_PATH+FILE_PATH_DELIMITER+EVENT_TYPE_JSON_PATH);
+<span class="pc bpc" id="L42" title="1 of 3 branches missed.">                hdwTransaction = switch (eventType) {</span>
+                    case DIRECT_EVENT -&gt;
+<span class="fc" id="L44">                            (HdwTransaction) JsonUtils.validateAndReadJsonMessage(messageBody, HDW_DIRECT_SCHEMA_FILE_NAME, HdwTransaction.class);</span>
+                    case INDIRECT_EVENT -&gt;
+<span class="fc" id="L46">                            (HdwTransaction) JsonUtils.validateAndReadJsonMessage(messageBody, HDW_INDIRECT_SCHEMA_FILE_NAME, HdwTransaction.class);</span>
+<span class="pc" id="L47">                    default -&gt; throw new IllegalStateException(&quot;Missing or Unexpected value for event_type: &quot; + eventType);</span>
+                };
+<span class="fc" id="L49">            } else {</span>
+<span class="nc" id="L50">                throw new JsonValidationException(ErrorMessages.MESSAGE_BODY_BLANK);</span>
+            }
+<span class="fc" id="L52">        } catch (Exception e) {</span>
+<span class="fc" id="L53">            originalMessage.ack();</span>
+<span class="fc" id="L54">            throw new ElmBusinessException(messageId, ErrorMessages.JSON_READ_FAILED, e);</span>
+<span class="fc" id="L55">        }</span>
+        try {
+<span class="fc" id="L57">            rows = RowMapperUtils.getRows(hdwTransaction);</span>
+<span class="nc" id="L58">        } catch (Exception e){</span>
+<span class="nc" id="L59">            originalMessage.ack();</span>
+<span class="nc" id="L60">            throw new ElmBusinessException(messageId, ErrorMessages.ROW_MAPPER_PROCESSING_FAILED, e);</span>
+<span class="fc" id="L61">        }</span>
+<span class="fc" id="L62">        log.debug(&quot;PubSubConsumerService: Calling bigQueryService.insertAll()&quot;);</span>
+        try {
+<span class="fc" id="L64">            elmTransactionBigQueryService.insertAll(rows);</span>
+<span class="fc" id="L65">            originalMessage.ack();</span>
+<span class="fc" id="L66">            log.info(&quot;ElmTransactionBigQueryService: Acknowledgement sent for PubSub message with ID: {}&quot;, messageId);</span>
+<span class="nc" id="L67">        }catch (BigQueryResponseException e) {</span>
+<span class="nc" id="L68">            originalMessage.ack();</span>
+<span class="nc" id="L69">            throw new ElmBusinessException(messageId, ErrorMessages.BIGQUERY_INSERT_RESPONSE_ERROR, e);</span>
+<span class="nc" id="L70">        } catch (BigQueryException e) {</span>
+<span class="nc" id="L71">            throw new ElmSystemException(this.elmTransactionBigQueryService.getTableName(), e.getMessage(), e);</span>
+<span class="fc" id="L72">        }</span>
+<span class="fc" id="L73">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,27 @@
+{
+  "projectInfo": {
+    "name": "EnterpriseLaborManagement",
+    "fmsNumber": "IT-79521",
+    "cdTemplate": "CD0000000",
+    "language": "java",
+    "versionStrategy": "tracker"
+  },
+  "fortify": {
+    "foldersToScan": "src/main/java,fortify",
+    "project-name": "EnterpriseLaborManagement"
+  },
+  "github": {
+		"org": "one-thd",
+		"repo": "EnterpriseLaborManagement",
+		"URL": "https://api.github.com/repos"
+	},
+  "tracker": {
+    "projectId": 3171
+  },
+  "environments": {
+    "production": {
+      "artifactCategory": "release",
+      "associatedBranchName": "master"
+    }
+  }
+}

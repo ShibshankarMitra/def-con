@@ -1,0 +1,128 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.5'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'jacoco'
+	id 'maven-publish'
+}
+
+group = 'com.homedepot.supplychain'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+tasks.named("bootBuildImage") {
+	builder = "dashaun/builder:tiny"
+	imageName = 'scope-native'
+	bindings = [
+			"${project.projectDir}/bindings:/platform/bindings:ro"
+	]
+}
+
+repositories {
+	maven {
+		url "https://maven.artifactory.homedepot.com/artifactory/libs-release/"
+		credentials {
+			username = System.getenv("GRADLEW_USERNAME")
+			password = System.getenv("GRADLEW_PASSWORD")
+
+		}
+	}
+	maven {
+		url "https://maven.artifactory.homedepot.com/artifactory/libs-snapshot"
+		credentials {
+			username = System.getenv("GRADLEW_USERNAME")
+			password = System.getenv("GRADLEW_PASSWORD")
+		}
+	}
+	maven {
+		url 'https://maven.artifactory.homedepot.com/artifactory/plugins-release'
+		credentials {
+			username = System.getenv("GRADLEW_USERNAME")
+			password = System.getenv("GRADLEW_PASSWORD")
+		}
+	}
+	maven {
+		url "https://maven.artifactory.homedepot.com/artifactory/libs-snapshot-local"
+		credentials {
+			username = System.getenv("GRADLEW_USERNAME")
+			password = System.getenv("GRADLEW_PASSWORD")
+		}
+	}
+	mavenCentral()
+	mavenLocal()
+	maven {
+		url "https://repo.spring.io/libs-milestone"
+	}
+}
+
+ext {
+	set('springCloudGcpVersion', "4.5.1")
+	set('springCloudVersion', "2020.0.3")
+}
+
+dependencies {
+
+	//Spring
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.integration:spring-integration-core:6.2.0'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	//Spring Cloud GCP Dependencies
+	implementation 'com.google.cloud:spring-cloud-gcp-autoconfigure'
+	implementation("com.google.cloud:spring-cloud-gcp-starter-pubsub")
+	implementation("com.google.cloud:spring-cloud-gcp-starter-bigquery")
+	implementation ('com.google.cloud:spring-cloud-gcp-starter')
+
+	//Logback
+	implementation ('com.google.cloud:spring-cloud-gcp-starter-logging')
+	implementation ('net.logstash.logback:logstash-logback-encoder:7.0')
+
+	//JSON,File,IO related
+	implementation 'com.networknt:json-schema-validator:1.0.72'
+	implementation 'commons-io:commons-io:2.11.0'
+
+	//Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	//Test
+	testImplementation 'org.mockito:mockito-inline:2.13.0'
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+	}
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:${springCloudGcpVersion}"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+test {
+	finalizedBy jacocoTestReport // report is always generated after tests run
+}
+jacocoTestReport {
+	dependsOn test // tests are required to run before generating the report
+
+	reports {
+		xml.required = true
+	}
+}
+
+jacoco {
+	toolVersion = "0.8.8"
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElmTransactionBigQueryService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnterpriseLaborManagement</a> &gt; <a href="index.source.html" class="el_package">com.homedepot.supplychain.enterpriselabormanagement.services</a> &gt; <span class="el_source">ElmTransactionBigQueryService.java</span></div><h1>ElmTransactionBigQueryService.java</h1><pre class="source lang-java linenums">package com.homedepot.supplychain.enterpriselabormanagement.services;
+
+import com.google.cloud.bigquery.*;
+import com.homedepot.supplychain.enterpriselabormanagement.annotations.NoIntercept;
+import com.homedepot.supplychain.enterpriselabormanagement.constants.ElmTransactionBqHeaders;
+import com.homedepot.supplychain.enterpriselabormanagement.exceptions.BigQueryResponseException;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L19">@Slf4j</span>
+public class ElmTransactionBigQueryService {
+
+    private final BigQuery bigquery;
+
+<span class="nc" id="L24">    @Getter</span>
+    @Value(&quot;${spring.cloud.gcp.bigquery.dataset-name}&quot;)
+    private String datasetName;
+
+<span class="nc" id="L28">    @Getter</span>
+    @Value(&quot;${elm.gcp.bigquery.elm-transactions-table-name}&quot;)
+    private String tableName;
+
+    @Autowired
+<span class="fc" id="L33">    public ElmTransactionBigQueryService(BigQuery bigquery) {</span>
+<span class="fc" id="L34">        this.bigquery = bigquery;</span>
+<span class="fc" id="L35">    }</span>
+
+    @NoIntercept
+    public void insertAll(List&lt;Map&lt;String, Object&gt;&gt; rowEntryMapList) throws BigQueryResponseException {
+<span class="fc" id="L39">        InsertAllRequest.Builder insertAllRequestBuilder = InsertAllRequest.newBuilder(datasetName, tableName);</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (!ObjectUtils.isEmpty(rowEntryMapList)) {</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">            for (Map&lt;String, Object&gt; rowEntryMap : rowEntryMapList) {</span>
+<span class="fc" id="L42">                insertAllRequestBuilder.addRow(rowEntryMap);</span>
+<span class="fc" id="L43">            }</span>
+<span class="fc" id="L44">            InsertAllRequest insertAllRequest = insertAllRequestBuilder.build();</span>
+<span class="fc" id="L45">            InsertAllResponse insertAllResponse = bigquery.insertAll(insertAllRequest);</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">            if (insertAllResponse.hasErrors()) {</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">                Map&lt;String, String&gt; rowErrorMap = insertAllResponse.getInsertErrors().entrySet().stream().filter(e -&gt; !StringUtils.isBlank(e.getValue().get(0).getMessage()))</span>
+<span class="nc" id="L48">                        .collect(Collectors.toMap(e -&gt; rowEntryMapList.get(Math.toIntExact(e.getKey())).toString(), e -&gt; e.getValue().toString()));</span>
+<span class="nc" id="L49">                log.warn(&quot;InsertAllResponse has errors for {} rows out of total {} rows&quot;, rowErrorMap.size(), insertAllRequest.getRows().size());</span>
+<span class="nc" id="L50">                StringBuilder errorMessageBuilder = new StringBuilder();</span>
+<span class="nc" id="L51">                rowErrorMap.forEach((row, error) -&gt; errorMessageBuilder.append(&quot;\n&quot;).append(&quot;ROW : &quot;).append(row).append(&quot; ERROR : &quot;).append(error));</span>
+<span class="nc" id="L52">                throw new BigQueryResponseException(errorMessageBuilder.toString());</span>
+            } else {
+<span class="fc" id="L54">                rowEntryMapList.forEach(e -&gt; log.info(&quot;Successfully inserted transaction with id: {} &quot;,</span>
+<span class="fc" id="L55">                        e.get(ElmTransactionBqHeaders.TRANSACTION_ID)));</span>
+            }
+        }
+<span class="fc" id="L58">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

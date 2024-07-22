@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "examples": [
+        34.234,
+        0.001,
+        122.00,
+        12
+      ]
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "Any String",
+        "   "
+      ]
+    },
+    "dateTime": {
+      "type": "string",
+      "examples": [
+        "2018-08-10T09:30:00.000"
+      ],
+      "pattern": "^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(.[0-9]{3,6})?$"
+    },
+    "emailId": {
+      "type": "string",
+      "format": "email",
+      "examples": [
+        "john.snow134@mail.com"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "schemaUrl": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "contract_version": {
+          "type": "number",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "source": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "event_type": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "platform": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "dc_number": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString",
+          "minLength": 4
+        },
+        "action": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "activity": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "publish_timestamp": {
+          "type": "string",
+          "$ref": "#/definitions/dateTime"
+        },
+        "trace_id": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        }
+      },
+      "required": [
+        "schemaUrl",
+        "contract_version",
+        "source",
+        "event_type",
+        "platform",
+        "dc_number",
+        "activity",
+        "action",
+        "publish_timestamp",
+        "trace_id"
+      ]
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "$ref": "#/definitions/emailId"
+        },
+        "ldap_id": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "transaction_id": {
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "transaction_timestamp": {
+          "type": "string",
+          "$ref": "#/definitions/dateTime"
+        }
+      },
+      "required": [
+        "user_id",
+        "ldap_id",
+        "transaction_id",
+        "transaction_timestamp"
+      ]
+    }
+  },
+  "required": [
+    "attributes",
+    "data"
+  ]
+}

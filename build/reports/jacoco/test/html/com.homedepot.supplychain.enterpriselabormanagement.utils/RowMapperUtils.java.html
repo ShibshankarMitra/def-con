@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RowMapperUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnterpriseLaborManagement</a> &gt; <a href="index.source.html" class="el_package">com.homedepot.supplychain.enterpriselabormanagement.utils</a> &gt; <span class="el_source">RowMapperUtils.java</span></div><h1>RowMapperUtils.java</h1><pre class="source lang-java linenums">package com.homedepot.supplychain.enterpriselabormanagement.utils;
+
+import static com.homedepot.supplychain.enterpriselabormanagement.constants.ElmTransactionBqHeaders.*;
+
+import com.homedepot.supplychain.enterpriselabormanagement.models.hdw.HdwTransaction;
+import org.apache.commons.lang3.ObjectUtils;
+
+import java.util.*;
+
+public final class RowMapperUtils {
+    private RowMapperUtils() {
+        //Utils class
+    }
+
+    public static List&lt;Map&lt;String, Object&gt;&gt; getRows(HdwTransaction hdwTransaction) {
+<span class="fc" id="L16">        List&lt;Map&lt;String, Object&gt;&gt; rows = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L17">        TransactionUtils.processTransaction(hdwTransaction);</span>
+<span class="fc" id="L18">        populateRowsFromTransaction(rows, hdwTransaction);</span>
+<span class="fc" id="L19">        return rows;</span>
+    }
+
+    private static void populateRowsFromTransaction(List&lt;Map&lt;String, Object&gt;&gt; rows, HdwTransaction hdwTransaction) {
+<span class="fc" id="L23">        Map&lt;String, Object&gt; row = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L24">        row.put(CONTRACT_VERSION, hdwTransaction.getAttributes().get(CONTRACT_VERSION));</span>
+<span class="fc" id="L25">        row.put(SOURCE, hdwTransaction.getAttributes().get(SOURCE));</span>
+<span class="fc" id="L26">        row.put(EVENT_TYPE, hdwTransaction.getAttributes().get(EVENT_TYPE));</span>
+<span class="fc" id="L27">        row.put(PLATFORM, hdwTransaction.getAttributes().get(PLATFORM));</span>
+<span class="fc" id="L28">        row.put(DC_NUMBER, hdwTransaction.getAttributes().get(DC_NUMBER));</span>
+<span class="fc" id="L29">        row.put(ACTIVITY, hdwTransaction.getAttributes().get(ACTIVITY));</span>
+<span class="fc" id="L30">        row.put(ACTION, hdwTransaction.getAttributes().get(ACTION));</span>
+<span class="fc" id="L31">        row.put(TRACE_ID, hdwTransaction.getAttributes().get(TRACE_ID));</span>
+<span class="fc" id="L32">        row.put(TASK_ID, hdwTransaction.getAttributes().get(TASK_ID));</span>
+<span class="fc" id="L33">        row.put(PUBLISH_TIMESTAMP, hdwTransaction.getAttributes().get(PUBLISH_TIMESTAMP));</span>
+<span class="fc" id="L34">        row.put(USER_ID, hdwTransaction.getData().getUserId());</span>
+<span class="fc" id="L35">        row.put(LDAP_ID, hdwTransaction.getData().getLdapId());</span>
+<span class="fc" id="L36">        row.put(TRANSACTION_ID, hdwTransaction.getData().getTransactionId());</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (!ObjectUtils.isEmpty(hdwTransaction.getData().getTransactionTimestamp())) {</span>
+<span class="fc" id="L38">            row.put(TRANSACTION_TIMESTAMP, hdwTransaction.getData().getTransactionTimestamp());</span>
+<span class="fc" id="L39">            row.put(PARTITION_DATE, CommonUtils.getDateFromTimeStampString(hdwTransaction.getData().getTransactionTimestamp()));</span>
+        }
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (!ObjectUtils.isEmpty(hdwTransaction.getData().getVehicle())) {</span>
+<span class="fc" id="L42">            row.put(VEHICLE_ID, hdwTransaction.getData().getVehicle().getVehicleId());</span>
+<span class="fc" id="L43">            row.put(ASSIGNED_VEHICLE, hdwTransaction.getData().getVehicle().getAssignedVehicle());</span>
+        }
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (!ObjectUtils.isEmpty(hdwTransaction.getData().getLpns())) {</span>
+<span class="fc" id="L46">            hdwTransaction.getData().getLpns().forEach(lpn -&gt; {</span>
+<span class="fc" id="L47">                row.put(PARENT_LPN_ID, lpn.getParentLpnId());</span>
+<span class="fc" id="L48">                row.put(LPN_NUMBER, lpn.getLpnNumber());</span>
+<span class="fc" id="L49">                row.put(CONTAINER_TYPE, lpn.getContainerType());</span>
+<span class="fc" id="L50">                lpn.getLocations().forEach(location -&gt; {</span>
+<span class="fc" id="L51">                    row.put(TRANSACTION_TIMESTAMP, location.getTransactionTimeStamp());</span>
+<span class="fc" id="L52">                    row.put(PARTITION_DATE, CommonUtils.getDateFromTimeStampString(location.getTransactionTimeStamp()));</span>
+<span class="fc" id="L53">                    row.put(START_LOCATION, location.getStartLocation());</span>
+<span class="fc" id="L54">                    row.put(END_LOCATION, location.getEndLocation());</span>
+<span class="fc" id="L55">                    row.put(START_ZONE, location.getStartZone());</span>
+<span class="fc" id="L56">                    row.put(END_ZONE, location.getEndZone());</span>
+<span class="fc" id="L57">                    row.put(START_LOCATION_TYPE, location.getStartLocationType());</span>
+<span class="fc" id="L58">                    row.put(END_LOCATION_TYPE, location.getEndLocationType());</span>
+<span class="fc" id="L59">                    row.put(PICK_AREA, location.getPickArea());</span>
+<span class="fc" id="L60">                    row.put(PUT_AREA, location.getPutArea());</span>
+<span class="fc" id="L61">                    row.put(LOCATION_UOM, location.getLocationUom());</span>
+<span class="fc" id="L62">                    row.put(LOCATION_QTY, location.getLocationQty());</span>
+<span class="fc" id="L63">                    row.put(UOM_QTY, location.getUomQty());</span>
+<span class="fc" id="L64">                    row.put(REASON_CODE, location.getReasonCode());</span>
+<span class="fc" id="L65">                    row.put(INBOUND_OUTBOUND_INDICATOR, location.getInboundOutboundIndicator());</span>
+<span class="fc" id="L66">                    row.put(ORDER_CATEGORY, location.getOrderCategory());</span>
+<span class="fc" id="L67">                    row.put(SHIPMENT_NUMBER, location.getShipmentNumber());</span>
+<span class="fc" id="L68">                    row.put(SHIPMENT_TYPE_ID, location.getShipmentTypeId());</span>
+<span class="fc" id="L69">                    row.put(SHIPMENT_ROUTE, location.getShipmentRoute());</span>
+<span class="fc" id="L70">                    row.put(SHIPMENT_STOP, location.getShipmentStop());</span>
+<span class="fc" id="L71">                    row.put(STORE_NUMBER, location.getStoreNumber());</span>
+<span class="fc" id="L72">                    row.put(SERVICE_TYPE, location.getServiceType());</span>
+<span class="fc" id="L73">                    row.put(VENDOR_NUMBER, location.getVendorNumber());</span>
+<span class="fc" id="L74">                    row.put(TRAILER_NUMBER, location.getTrailerNumber());</span>
+<span class="fc" id="L75">                    row.put(RAIL_CAR_NUMBER, location.getRailCarNumber());</span>
+<span class="fc" id="L76">                    row.put(SCAC, location.getScac());</span>
+<span class="fc" id="L77">                    row.put(LPN_STATUS, location.getLpnStatus());</span>
+<span class="fc" id="L78">                    row.put(SHIPMENT_LPN_ERROR_TYPE, location.getShipmentLpnErrorType());</span>
+<span class="fc" id="L79">                    row.put(MHE_LOADED, location.getMheLoaded());</span>
+<span class="fc" id="L80">                    location.getSkus().forEach(sku -&gt; {</span>
+<span class="fc" id="L81">                        row.put(SKU_NUMBER, sku.getSkuNumber());</span>
+<span class="fc" id="L82">                        row.put(BUILD_ID, sku.getBuildId());</span>
+<span class="fc" id="L83">                        row.put(SKU_DESCRIPTION, sku.getSkuDescription());</span>
+<span class="fc" id="L84">                        row.put(DEPARTMENT, sku.getDepartment());</span>
+<span class="fc" id="L85">                        row.put(SKU_CLASS, sku.getSkuClass());</span>
+<span class="fc" id="L86">                        row.put(SKU_SUB_CLASS, sku.getSkuSubClass());</span>
+<span class="fc" id="L87">                        row.put(WEIGHT, sku.getWeight());</span>
+<span class="fc" id="L88">                        row.put(LENGTH, sku.getLength());</span>
+<span class="fc" id="L89">                        row.put(WIDTH, sku.getWidth());</span>
+<span class="fc" id="L90">                        row.put(HEIGHT, sku.getHeight());</span>
+<span class="fc" id="L91">                        row.put(VOLUME, sku.getVolume());</span>
+<span class="fc" id="L92">                        row.put(WEIGHT_UOM, sku.getWeightUom());</span>
+<span class="fc" id="L93">                        row.put(SIZE_UOM, sku.getSizeUom());</span>
+<span class="fc" id="L94">                        row.put(PACKAGE_EACH_QTY, sku.getPackageEachQty());</span>
+<span class="fc" id="L95">                        row.put(PACKAGE_UNIT_QTY, sku.getPackageUnitQty());</span>
+<span class="fc" id="L96">                        row.put(SPECIAL_HANDLING, sku.getSpecialHandling());</span>
+<span class="fc" id="L97">                        row.put(BUILD_ON_METHOD, sku.getBuildOnMethod());</span>
+<span class="fc" id="L98">                        row.put(SECURE_METHOD, sku.getSecureMethod());</span>
+<span class="fc" id="L99">                        row.put(UNLOAD_TYPE, sku.getUnloadType());</span>
+<span class="fc" id="L100">                        row.put(ELM_ID, CommonUtils.getRandomUuid());</span>
+<span class="fc" id="L101">                        row.put(BQ_CREATE_DTTM, CommonUtils.getCurrentTimeStampToBqFormat());</span>
+<span class="fc" id="L102">                        HashMap&lt;String, Object&gt; rowToBeInserted = new LinkedHashMap&lt;&gt;(row);</span>
+<span class="fc" id="L103">                        rows.add(rowToBeInserted);</span>
+<span class="fc" id="L104">                    });</span>
+<span class="fc" id="L105">                });</span>
+<span class="fc" id="L106">            });</span>
+        } else {
+<span class="fc" id="L108">            row.put(ELM_ID, CommonUtils.getRandomUuid());</span>
+<span class="fc" id="L109">            row.put(BQ_CREATE_DTTM, CommonUtils.getCurrentTimeStampToBqFormat());</span>
+<span class="fc" id="L110">            HashMap&lt;String, Object&gt; rowToBeInserted = new LinkedHashMap&lt;&gt;(row);</span>
+<span class="fc" id="L111">            rows.add(rowToBeInserted);</span>
+        }
+<span class="fc" id="L113">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,64 @@
+osc-spring-microservice:
+  appName: EnterpriseLaborManagement
+  branchName: unset
+  annotations:
+    cloud.google.com/neg: '{"exposed_ports": {"80":{"name": "EnterpriseLaborManagement-neg"}}}'
+
+  emissary:
+    enabled: false
+
+  image:
+    repository: unset
+    tag: unset
+    pullPolicy: IfNotPresent
+
+  hdwPodLifecycle:
+    preStop:
+      exec:
+        command: ["/bin/sh", "-c", "sleep 20s"]
+
+  replicaCount: 1
+
+  # Service type `LoadBalancer` will generate a Google Load Balancer with a public IP (THD IP whitelist).
+  # Set to `ClusterIP` to restrict access to other services within the cluster.
+  # Higher lifecycles will not expose IP addresses without authentication.
+  service:
+    type: LoadBalancer
+
+  prometheus:
+    path: /actuator/prometheus
+
+  loadBalancerSourceRanges:
+    - 151.140.0.0/16
+    - 165.130.0.0/16
+    - 207.11.0.0/17
+    - 50.207.28.8/29
+    - 98.6.11.8/29
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+
+
+  resources:
+    # Request quota should not be less than 512Mi/500m. Kubernetes will schedule pods
+    # in a way that guarantees at least the requested amount of resources are avialable.
+    requests:
+      cpu: 1
+      memory: 2048Mi
+    # Limits are not required, and should be set generously for core services. Free resources
+    # on a node are available to the pod, up to these limits. This greatly improves startup times.
+    limits:
+      cpu: 1
+      memory: 4096Mi
+
+  readinessProbe:
+    httpGet:
+      path: /actuator/health
+      port: http
+    timeoutSeconds: 1
+    initialDelaySeconds: 10
+    periodSeconds: 5
+

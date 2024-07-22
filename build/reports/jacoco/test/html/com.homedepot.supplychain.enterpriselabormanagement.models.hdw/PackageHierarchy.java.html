@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PackageHierarchy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnterpriseLaborManagement</a> &gt; <a href="index.source.html" class="el_package">com.homedepot.supplychain.enterpriselabormanagement.models.hdw</a> &gt; <span class="el_source">PackageHierarchy.java</span></div><h1>PackageHierarchy.java</h1><pre class="source lang-java linenums">package com.homedepot.supplychain.enterpriselabormanagement.models.hdw;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+
+@Getter
+<span class="fc" id="L12">@Setter</span>
+<span class="fc" id="L13">@NoArgsConstructor</span>
+public class PackageHierarchy {
+    @JsonProperty(&quot;depth&quot;)
+<span class="fc" id="L16">    private BigDecimal depth;</span>
+    @JsonProperty(&quot;width&quot;)
+<span class="fc" id="L18">    private BigDecimal width;</span>
+    @JsonProperty(&quot;weight&quot;)
+<span class="fc" id="L20">    private BigDecimal weight;</span>
+    @JsonProperty(&quot;height&quot;)
+<span class="fc" id="L22">    private BigDecimal height;</span>
+    @JsonProperty(&quot;weight_uom&quot;)
+<span class="fc" id="L24">    private String weightUom;</span>
+    @JsonProperty(&quot;size_uom&quot;)
+<span class="fc" id="L26">    private String sizeUom;</span>
+    @JsonProperty(&quot;package_unit_qty&quot;)
+<span class="fc" id="L28">    private BigDecimal packageUnitQty;</span>
+    @JsonProperty(&quot;package_each_qty&quot;)
+<span class="fc" id="L30">    private BigDecimal packageEachQty;</span>
+    @Getter(AccessLevel.NONE)
+    @JsonProperty(&quot;i_package_unit_qty&quot;)
+    private BigDecimal intPackageUnitQty;
+    @Getter(AccessLevel.NONE)
+    @JsonProperty(&quot;i_package_each_qty&quot;)
+    private BigDecimal intPackageEachQty;
+    @JsonProperty(&quot;hierarchy_level_code&quot;)
+<span class="fc" id="L38">    private String hierarchyLevelCode;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

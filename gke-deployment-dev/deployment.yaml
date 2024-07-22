@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${artifact_name}
+  namespace: elm-integration
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: elm
+  template:
+    metadata:
+      labels:
+        app: elm
+      name: ${artifact_name}
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: ${artifact_name}-config
+          image: us-east1-docker.pkg.dev/np-sc-distribution/gcf-artifacts/com/homedepot/supplychain/${artifact_name}/np:${image_version}
+          imagePullPolicy: Always
+          name: elm
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+            limits:
+              cpu: 200m
+              memory: 1000Mi
+      serviceAccountName: elm-integration
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ${artifact_name}-auto-scale
+  namespace: elm-integration
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ${artifact_name}
+  minReplicas: ${#toInt(min_pods)}
+  maxReplicas: ${#toInt(max_pods)}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
