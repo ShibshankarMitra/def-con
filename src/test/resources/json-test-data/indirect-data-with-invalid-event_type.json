@@ -1,7 +1,7 @@
 {
   "attributes": {
     "schemaUrl": "<insert schema url>",
-    "contract_version": 0.1,
+    "contract_version": "0.1",
     "source": "HDW",
     "event_type": "INVALID",
     "platform": "FDC",

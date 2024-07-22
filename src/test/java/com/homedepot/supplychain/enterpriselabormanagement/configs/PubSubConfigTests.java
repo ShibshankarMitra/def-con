@@ -11,7 +11,7 @@ import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
 import com.homedepot.supplychain.enterpriselabormanagement.constants.CommonConstants;
 import com.homedepot.supplychain.enterpriselabormanagement.services.PubSubConsumerService;
-import com.homedepot.supplychain.enterpriselabormanagement.utils.TestConstants;
+import com.homedepot.supplychain.enterpriselabormanagement.utils.TestData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,16 +34,16 @@ class PubSubConfigTests {
     @Mock
     PubSubConfiguration pubSubConfiguration;
 
-    @Value(TestConstants.TEST_SUBSCRIPTION_NAME)
+    @Value(TestData.TEST_SUBSCRIPTION_NAME)
     private String subscriptionName;
 
-    @Value(TestConstants.TEST_PROJECT_ID)
+    @Value(TestData.TEST_PROJECT_ID)
     private String projectId;
 
-    @Value(TestConstants.TEST_FLOW_CONTROL_COUNT)
+    @Value(TestData.TEST_FLOW_CONTROL_COUNT)
     private String maxOutstandingElementCount;
 
-    @Value(TestConstants.TEST_FLOW_CONTROL_BYTES)
+    @Value(TestData.TEST_FLOW_CONTROL_BYTES)
     private String maxOutstandingRequestBytes;
     @Captor
     ArgumentCaptor<String> messageIdCaptor;
@@ -103,10 +103,10 @@ class PubSubConfigTests {
     void testMessageReceiver() {
         BasicAcknowledgeablePubsubMessage basicAcknowledgeablePubsubMessage = Mockito.mock(BasicAcknowledgeablePubsubMessage.class);
         PubsubMessage pubsubMessage = Mockito.mock(PubsubMessage.class);
-        Message<String> message = MessageBuilder.withPayload(TestConstants.TEST_PAYLOAD).setHeader(GcpPubSubHeaders.ORIGINAL_MESSAGE, basicAcknowledgeablePubsubMessage).build();
+        Message<String> message = MessageBuilder.withPayload(TestData.TEST_PAYLOAD).setHeader(GcpPubSubHeaders.ORIGINAL_MESSAGE, basicAcknowledgeablePubsubMessage).build();
         Mockito.when(basicAcknowledgeablePubsubMessage.getPubsubMessage()).thenReturn(pubsubMessage);
-        Mockito.when(pubsubMessage.getMessageId()).thenReturn(TestConstants.TEST_MESSAGE_ID);
-        Mockito.when(pubsubMessage.getData()).thenReturn(ByteString.copyFromUtf8(TestConstants.TEST_MESSAGE_BODY));
+        Mockito.when(pubsubMessage.getMessageId()).thenReturn(TestData.TEST_MESSAGE_ID);
+        Mockito.when(pubsubMessage.getData()).thenReturn(ByteString.copyFromUtf8(TestData.TEST_MESSAGE_BODY));
         MessageHandler messageHandler = pubSubConfig.messageReceiver(pubSubConsumerService);
         messageHandler.handleMessage(message);
         //Verifying that pubSubConsumerService.processPubSubToBq() has been triggered at least once and only once per a message is received
@@ -114,8 +114,8 @@ class PubSubConfigTests {
         Mockito.verify(pubSubConsumerService, Mockito.times(1)).processPubSubToBq(messageIdCaptor.capture(), messageBodyCaptor.capture(), originalMessageCaptor.capture());
 
         //Asserting that messageId, messageBody, and originalMessage sent to be processed is same as received from the headers
-        Assertions.assertEquals(TestConstants.TEST_MESSAGE_ID, messageIdCaptor.getValue());
-        Assertions.assertEquals(TestConstants.TEST_MESSAGE_BODY, messageBodyCaptor.getValue());
+        Assertions.assertEquals(TestData.TEST_MESSAGE_ID, messageIdCaptor.getValue());
+        Assertions.assertEquals(TestData.TEST_MESSAGE_BODY, messageBodyCaptor.getValue());
         Assertions.assertEquals(originalMessageCaptor.getValue(), basicAcknowledgeablePubsubMessage);
     }
 
@@ -123,11 +123,11 @@ class PubSubConfigTests {
     void testMessageReceiverWithException() {
         BasicAcknowledgeablePubsubMessage basicAcknowledgeablePubsubMessage = Mockito.mock(BasicAcknowledgeablePubsubMessage.class);
         PubsubMessage pubsubMessage = Mockito.mock(PubsubMessage.class);
-        Message<String> message = MessageBuilder.withPayload(TestConstants.TEST_PAYLOAD).setHeader(GcpPubSubHeaders.ORIGINAL_MESSAGE, basicAcknowledgeablePubsubMessage).build();
+        Message<String> message = MessageBuilder.withPayload(TestData.TEST_PAYLOAD).setHeader(GcpPubSubHeaders.ORIGINAL_MESSAGE, basicAcknowledgeablePubsubMessage).build();
         Mockito.when(basicAcknowledgeablePubsubMessage.getPubsubMessage()).thenReturn(pubsubMessage);
-        Mockito.when(pubsubMessage.getMessageId()).thenReturn(TestConstants.TEST_MESSAGE_ID);
-        Mockito.when(pubsubMessage.getData()).thenReturn(ByteString.copyFromUtf8(TestConstants.TEST_MESSAGE_BODY_BLANK));
-        Mockito.doThrow(RuntimeException.class).when(pubSubConsumerService).processPubSubToBq(TestConstants.TEST_MESSAGE_ID, TestConstants.TEST_MESSAGE_BODY_BLANK, basicAcknowledgeablePubsubMessage);
+        Mockito.when(pubsubMessage.getMessageId()).thenReturn(TestData.TEST_MESSAGE_ID);
+        Mockito.when(pubsubMessage.getData()).thenReturn(ByteString.copyFromUtf8(TestData.TEST_MESSAGE_BODY_BLANK));
+        Mockito.doThrow(RuntimeException.class).when(pubSubConsumerService).processPubSubToBq(TestData.TEST_MESSAGE_ID, TestData.TEST_MESSAGE_BODY_BLANK, basicAcknowledgeablePubsubMessage);
         MessageHandler messageHandler = pubSubConfig.messageReceiver(pubSubConsumerService);
         //Asserting that message handler will not throw an exception to the adapter, as we are handling the exceptions using aspects
         Assertions.assertDoesNotThrow(() -> messageHandler.handleMessage(message));
@@ -135,7 +135,7 @@ class PubSubConfigTests {
 
     @Test
     void testMessageReceiverWithEmptyMessage() {
-        Message<String> message = MessageBuilder.withPayload(TestConstants.TEST_PAYLOAD).setHeader(GcpPubSubHeaders.ORIGINAL_MESSAGE, null).build();
+        Message<String> message = MessageBuilder.withPayload(TestData.TEST_PAYLOAD).setHeader(GcpPubSubHeaders.ORIGINAL_MESSAGE, null).build();
         MessageHandler messageHandler = pubSubConfig.messageReceiver(pubSubConsumerService);
         messageHandler.handleMessage(message);
         //Verifying that pubSubConsumerService.processPubSubToBq() has not  been triggered at all as the message received is Null

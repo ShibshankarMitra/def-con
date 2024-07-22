@@ -1,8 +1,6 @@
 package com.homedepot.supplychain.enterpriselabormanagement.utils;
 
-import com.google.cloud.bigquery.FieldValueList;
-import com.google.cloud.bigquery.TableResult;
-import io.micrometer.common.util.StringUtils;
+import com.google.cloud.bigquery.*;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,40 +10,104 @@ import org.junit.jupiter.api.Assertions;
 import java.util.*;
 
 import static com.homedepot.supplychain.enterpriselabormanagement.constants.ElmTransactionBqHeaders.*;
-import static com.homedepot.supplychain.enterpriselabormanagement.utils.TestConstants.*;
 
 @Slf4j
 public final class TestUtils {
+
+    public static final String TIMESTAMP_ZONE_APPENDER = "Z";
+
+    public static final List<String> ATTRIBUTE_OPTIONAL_FIELDS = List.of(TASK_ID);
+    public static final List<String> LPN_OPTIONAL_FIELDS = List.of(PARENT_LPN_ID, CONTAINER_TYPE);
+    public static final List<String> LOCATION_OPTIONAL_FIELDS = List.of(PICK_AREA, PUT_AREA,
+            REASON_CODE, ORDER_CATEGORY, SHIPMENT_NUMBER, SHIPMENT_TYPE_ID, SHIPMENT_ROUTE,
+            SHIPMENT_STOP, STORE_NUMBER, SERVICE_TYPE, VENDOR_NUMBER, TRAILER_NUMBER, SCAC, LPN_STATUS,
+            SHIPMENT_LPN_ERROR_TYPE, MHE_LOADED);
+    public static final List<String> SKU_OPTIONAL_FIELDS = List.of(
+            SPECIAL_HANDLING, BUILD_ON_METHOD,
+            SECURE_METHOD, UNLOAD_TYPE);
 
     private TestUtils() {
         //Utils class
     }
 
+    public static Schema getElmSchema() {
+        return Schema.of(
+                Field.of(ELM_ID, StandardSQLTypeName.STRING),
+                Field.of(BQ_CREATE_DTTM, StandardSQLTypeName.TIMESTAMP),
+                Field.of(CONTRACT_VERSION, StandardSQLTypeName.STRING),
+                Field.of(SOURCE, StandardSQLTypeName.STRING),
+                Field.of(EVENT_TYPE, StandardSQLTypeName.STRING),
+                Field.of(PLATFORM, StandardSQLTypeName.STRING),
+                Field.of(DC_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(ACTIVITY, StandardSQLTypeName.STRING),
+                Field.of(ACTION, StandardSQLTypeName.STRING),
+                Field.of(TRACE_ID, StandardSQLTypeName.STRING),
+                Field.of(TASK_ID, StandardSQLTypeName.STRING),
+                Field.of(PARTITION_DATE, StandardSQLTypeName.DATE),
+                Field.of(PUBLISH_TIMESTAMP, StandardSQLTypeName.TIMESTAMP),
+                Field.of(USER_ID, StandardSQLTypeName.STRING),
+                Field.of(LDAP_ID, StandardSQLTypeName.STRING),
+                Field.of(TRANSACTION_ID, StandardSQLTypeName.STRING),
+                Field.of(ASSIGNED_VEHICLE, StandardSQLTypeName.STRING),
+                Field.of(VEHICLE_ID, StandardSQLTypeName.STRING),
+                Field.of(PARENT_LPN_ID, StandardSQLTypeName.STRING),
+                Field.of(LPN_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(CONTAINER_TYPE, StandardSQLTypeName.STRING),
+                Field.of(TRANSACTION_TIMESTAMP, StandardSQLTypeName.TIMESTAMP),
+                Field.of(START_LOCATION, StandardSQLTypeName.STRING),
+                Field.of(END_LOCATION, StandardSQLTypeName.STRING),
+                Field.of(START_ZONE, StandardSQLTypeName.STRING),
+                Field.of(END_ZONE, StandardSQLTypeName.STRING),
+                Field.of(START_LOCATION_TYPE, StandardSQLTypeName.STRING),
+                Field.of(END_LOCATION_TYPE, StandardSQLTypeName.STRING),
+                Field.of(PICK_AREA, StandardSQLTypeName.STRING),
+                Field.of(PUT_AREA, StandardSQLTypeName.STRING),
+                Field.of(SKU_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(BUILD_ID, StandardSQLTypeName.STRING),
+                Field.of(SKU_DESCRIPTION, StandardSQLTypeName.STRING),
+                Field.of(DEPARTMENT, StandardSQLTypeName.STRING),
+                Field.of(SKU_CLASS, StandardSQLTypeName.STRING),
+                Field.of(SKU_SUB_CLASS, StandardSQLTypeName.STRING),
+                Field.of(WEIGHT, StandardSQLTypeName.NUMERIC),
+                Field.of(LENGTH, StandardSQLTypeName.NUMERIC),
+                Field.of(WIDTH, StandardSQLTypeName.NUMERIC),
+                Field.of(HEIGHT, StandardSQLTypeName.NUMERIC),
+                Field.of(VOLUME, StandardSQLTypeName.NUMERIC),
+                Field.of(WEIGHT_UOM, StandardSQLTypeName.STRING),
+                Field.of(SIZE_UOM, StandardSQLTypeName.STRING),
+                Field.of(PACKAGE_UNIT_QTY, StandardSQLTypeName.NUMERIC),
+                Field.of(PACKAGE_EACH_QTY, StandardSQLTypeName.NUMERIC),
+                Field.of(SPECIAL_HANDLING, StandardSQLTypeName.STRING),
+                Field.of(BUILD_ON_METHOD, StandardSQLTypeName.STRING),
+                Field.of(SECURE_METHOD, StandardSQLTypeName.STRING),
+                Field.of(UNLOAD_TYPE, StandardSQLTypeName.STRING),
+                Field.of(LOCATION_UOM, StandardSQLTypeName.STRING),
+                Field.of(LOCATION_QTY, StandardSQLTypeName.NUMERIC),
+                Field.of(UOM_QTY, StandardSQLTypeName.NUMERIC),
+                Field.of(REASON_CODE, StandardSQLTypeName.STRING),
+                Field.of(INBOUND_OUTBOUND_INDICATOR, StandardSQLTypeName.STRING),
+                Field.of(ORDER_CATEGORY, StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_TYPE_ID, StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_ROUTE, StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_STOP, StandardSQLTypeName.STRING),
+                Field.of(STORE_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(SERVICE_TYPE, StandardSQLTypeName.STRING),
+                Field.of(VENDOR_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(TRAILER_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(RAIL_CAR_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(SCAC, StandardSQLTypeName.STRING),
+                Field.of(LPN_STATUS, StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_LPN_ERROR_TYPE, StandardSQLTypeName.STRING),
+                Field.of(MHE_LOADED, StandardSQLTypeName.STRING)
+        );
+    }
 
-    public static String getValueFromJson(String jsonMessage, String path) throws JSONException {
-        String value = null;
-        JSONObject jsonObject = new JSONObject(jsonMessage);
-        String[] paths = path.split("\\.");
-        for (int i = 0; i < paths.length - 1; i++) {
-            if (paths[i].contains("[") && paths[i].contains("]")) {
-                int startIndex = paths[i].lastIndexOf("[");
-                int index = Integer.parseInt(paths[i].substring(startIndex + 1, startIndex + 2));
-                String jsonArrayName = paths[i].substring(0, startIndex);
-                JSONArray jsonArray = null;
-                jsonArray = jsonObject.getJSONArray(jsonArrayName);
-                jsonObject = jsonArray.getJSONObject(index);
-            } else {
-                jsonObject = jsonObject.getJSONObject(paths[i]);
-            }
-        }
-        if (!StringUtils.isBlank(jsonObject.getString(paths[paths.length - 1]))) {
-            value = jsonObject.getString(paths[paths.length - 1]);
-        }
-        return value;
+    public static String getSelectAllQuery(String datasetID, String tableName) {
+        return String.format("SELECT * FROM %s.%s", datasetID, tableName);
     }
 
     public static void assertTableResultsAgainstJson(TableResult tableResult, String jsonMessage) throws JSONException {
-        boolean results = false;
         Iterator<FieldValueList> fieldValueListIterator = tableResult.iterateAll().iterator();
         Map<String, String> row = new LinkedHashMap<>();
         JSONObject jsonObject = new JSONObject(jsonMessage);
@@ -159,12 +221,12 @@ public final class TestUtils {
                     }
                 }
             }
-        }else {
+        } else {
             compareRows(fieldValueListIterator.next(), row);
         }
     }
 
-    public static void compareRows(FieldValueList actualRow, Map<String, String> expectedRow) {
+    private static void compareRows(FieldValueList actualRow, Map<String, String> expectedRow) {
         log.info("Running comparison for row :{}", expectedRow.toString());
         Assertions.assertNotNull(actualRow.get(ELM_ID));
         Assertions.assertNotNull(actualRow.get(BQ_CREATE_DTTM));
@@ -173,19 +235,39 @@ public final class TestUtils {
                 .getTimestampInstant().toString()
                 .contains(actualRow.get(PARTITION_DATE).getStringValue()));
         expectedRow.forEach((k, v) -> {
-            if (StringUtils.isEmpty(v)) {
-                if(!actualRow.get(k).isNull()) {
-                    Assertions.assertEquals(actualRow.get(k).getStringValue(),v);
-                }
-            } else {
-                log.info("Comparing column:{} actual {} expected {} ", k, actualRow.get(k).getStringValue(), v);
-                if (Objects.equals(k, PUBLISH_TIMESTAMP)
-                        || Objects.equals(k, TRANSACTION_TIMESTAMP)) {
-                    Assertions.assertTrue(actualRow.get(k).getTimestampInstant().toString().contains(v));
+            String actualValue;
+            String expectedValue;
+            if (!actualRow.get(k).isNull()) {
+                if (Objects.equals(k, PUBLISH_TIMESTAMP) || Objects.equals(k, TRANSACTION_TIMESTAMP)) {
+                    expectedValue = v + TIMESTAMP_ZONE_APPENDER;
+                    actualValue = actualRow.get(k).getTimestampInstant().toString();
                 } else {
-                    Assertions.assertEquals(actualRow.get(k).getStringValue(), v);
+                    expectedValue = v;
+                    actualValue = actualRow.get(k).getStringValue();
                 }
+                log.info("Comparing column:{} [expected= {}, actual= {}]", k, expectedValue, actualValue);
+                Assertions.assertEquals(expectedValue, actualValue);
             }
         });
+    }
+
+    public static void validateR2RJsonPayloadAgainstHdw(String r2rPayload, String hdwPayload) throws JSONException {
+        JSONObject r2rJsonObject = new JSONObject(r2rPayload);
+        JSONObject hdwJsonObject = new JSONObject(hdwPayload);
+        String dc_number = hdwJsonObject.getJSONObject("attributes").getString(DC_NUMBER);
+        String trace_id = hdwJsonObject.getJSONObject("attributes").getString(TRACE_ID);
+        String transactionId = r2rJsonObject.getJSONObject("header").getString("transactionId");
+        String locationId = r2rJsonObject.getJSONObject("header").getString("locationId");
+        JSONArray entitiesJsonArray = r2rJsonObject.getJSONObject("body").getJSONArray("entities");
+        for (int k = 0; k < entitiesJsonArray.length(); k++) {
+            JSONObject entity = entitiesJsonArray.getJSONObject(k);
+            String id = entity.getString("id");
+            log.info("Comparing id={} from R2R message with trace_id={} from hdw message", id, trace_id);
+            Assertions.assertEquals(id, trace_id);
+            log.info("Comparing locationId={} from R2R message with dc_number={} from hdw message", locationId, dc_number);
+            Assertions.assertEquals(locationId, dc_number);
+            log.info("Asserting not null transactionId={} from R2R message", transactionId);
+            Assertions.assertNotNull(transactionId);
+        }
     }
 }

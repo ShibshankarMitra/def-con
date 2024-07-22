@@ -94,14 +94,16 @@ dependencies {
 	//Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-
-	//Test
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+
+
+	//Test
 	testImplementation 'org.mockito:mockito-inline:2.13.0'
-	testImplementation ('org.testcontainers:junit-jupiter:1.19.1')
-	testImplementation ('org.testcontainers:gcloud:1.19.1')
-	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+	testImplementation 'org.testcontainers:junit-jupiter:1.19.1'
+	testImplementation 'javax.inject:javax.inject:1'
+	testImplementation 'org.testcontainers:gcloud:1.19.1'
+	testImplementation ('org.springframework.boot:spring-boot-starter-test') {
 	}
 }
 
@@ -112,7 +114,38 @@ dependencyManagement {
 	}
 }
 
+sourceSets {
+	integrationTest {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file('src/integration-test/java')
+		}
+		resources.srcDir file('src/integration-test/resources')
+	}
+}
+
+configurations {
+	integrationTestCompile.extendsFrom (testCompile)
+	integrationTestRuntime.extendsFrom (testRuntime)
+	integrationTestImplementation.extendsFrom (testImplementation)
+	integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+	integrationTestCompileOnly.extendsFrom(testCompileOnly)
+	integrationTestAnnotationProcessor.extendsFrom(testAnnotationProcessor)
+}
+
+tasks.register('integrationTest', Test) {
+	description = "Run integration tests"
+	group = "verification"
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
 tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks.named('integrationTest') {
 	useJUnitPlatform()
 }
 

@@ -44,8 +44,8 @@
           "$ref": "#/definitions/nonEmptyString"
         },
         "contract_version": {
-          "type": "number",
-          "$ref": "#/definitions/positiveNumber"
+          "type": "string",
+          "$ref": "#/definitions/nonEmptyString"
         },
         "source": {
           "type": "string",

@@ -2,7 +2,6 @@ package com.homedepot.supplychain.enterpriselabormanagement.services;
 
 import com.google.cloud.bigquery.*;
 import com.homedepot.supplychain.enterpriselabormanagement.exceptions.BigQueryResponseException;
-import com.homedepot.supplychain.enterpriselabormanagement.utils.TestConstants;
 import com.homedepot.supplychain.enterpriselabormanagement.utils.TestData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
-class ElmTransactionBigQueryServiceTests extends TestData {
+class ElmTransactionBigQueryServiceTests {
     @InjectMocks
     ElmTransactionBigQueryService elmTransactionBigQueryService;
     @Mock
@@ -27,9 +26,9 @@ class ElmTransactionBigQueryServiceTests extends TestData {
     @Captor
     ArgumentCaptor<InsertAllRequest> insertAllRequestCaptor;
 
-    @Value(TestConstants.TEST_DATASET_NAME)
+    @Value(TestData.TEST_DATASET_NAME)
     private String datasetName;
-    @Value(TestConstants.TEST_TRANSACTION_TABLE_NAME)
+    @Value(TestData.TEST_TRANSACTION_TABLE_NAME)
     private String tableName;
 
     @BeforeEach
@@ -40,7 +39,7 @@ class ElmTransactionBigQueryServiceTests extends TestData {
 
     @Test
     void testInsertAllWithSuccess() {
-        List<Map<String, Object>> rowMapperList = super.getRowMapperList();
+        List<Map<String, Object>> rowMapperList = TestData.getRowMapperList();
         Mockito.when(bigQuery.insertAll(ArgumentMatchers.any(InsertAllRequest.class))).thenReturn(insertAllResponse);
         Mockito.when(insertAllResponse.hasErrors()).thenReturn(false);
         elmTransactionBigQueryService.insertAll(rowMapperList);
@@ -61,7 +60,7 @@ class ElmTransactionBigQueryServiceTests extends TestData {
 
     @Test
     void testInsertAllWithEmptyRowMapperList() {
-        List<Map<String, Object>> rowMapperList = super.getEmptyRowMapperList();
+        List<Map<String, Object>> rowMapperList = TestData.getEmptyRowMapperList();
         //Verifying that insertAll() was never invoked as the rowMapperList is empty
         Mockito.verify(bigQuery, Mockito.times(0)).insertAll(insertAllRequestCaptor.capture());
         //Asserting that BigQueryResponseException is not thrown
@@ -70,8 +69,8 @@ class ElmTransactionBigQueryServiceTests extends TestData {
 
     @Test
     void testInsertAllWithInsertErrors() {
-        List<Map<String, Object>> rowMapperList = super.getRowMapperList();
-        Map<Long, List<BigQueryError>> insertErrorMap = getInsertErrorMap();
+        List<Map<String, Object>> rowMapperList = TestData.getRowMapperList();
+        Map<Long, List<BigQueryError>> insertErrorMap = TestData.getInsertErrorMap();
         Mockito.when(bigQuery.insertAll(ArgumentMatchers.any(InsertAllRequest.class))).thenReturn(insertAllResponse);
         Mockito.when(insertAllResponse.hasErrors()).thenReturn(true);
         Mockito.when(insertAllResponse.getInsertErrors()).thenReturn(insertErrorMap);
@@ -82,7 +81,7 @@ class ElmTransactionBigQueryServiceTests extends TestData {
 
     @Test
     void testInsertAllWithWithBigQueryException() {
-        List<Map<String, Object>> rowMapperList = super.getRowMapperList();
+        List<Map<String, Object>> rowMapperList = TestData.getRowMapperList();
         Mockito.when(bigQuery.insertAll(ArgumentMatchers.any(InsertAllRequest.class))).thenThrow(BigQueryException.class);
         //Asserting that If any BigQuery exception is encountered it will be returned as is for the caller method to handle.
         Assertions.assertThrows(BigQueryException.class, () -> elmTransactionBigQueryService.insertAll(rowMapperList));

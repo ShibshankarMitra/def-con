@@ -1,172 +1,180 @@
 package com.homedepot.supplychain.enterpriselabormanagement.utils;
 
 import com.google.cloud.bigquery.BigQueryError;
-import com.google.cloud.bigquery.Field;
-import com.google.cloud.bigquery.Schema;
-import com.google.cloud.bigquery.StandardSQLTypeName;
-import com.homedepot.supplychain.enterpriselabormanagement.constants.ElmTransactionBqHeaders;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.homedepot.supplychain.enterpriselabormanagement.constants.ElmTransactionBqHeaders.*;
 
-public class TestData {
+public final class TestData {
 
-    protected String getMessageId() {
-        return TestConstants.TEST_MESSAGE_ID;
+    public static final String TEST_MESSAGE_ID = "test message id";
+
+    public static final String TEST_COLUMN_VALUE = "test";
+    //JSON Validation
+    public static final String TEST_TEXT_PAYLOAD = "INVALID TEXT";
+    public static final String TEST_EMPTY_PAYLOAD = "   ";
+
+    public static final String TEST_MESSAGE_BODY = "test message Body";
+    public static final String TEST_MESSAGE_BODY_BLANK = " ";
+
+    //GCP Resources
+    public static final String TEST_PROJECT_ID = "test project id";
+    public static final String TEST_SUBSCRIPTION_NAME = "test subscription name";
+    public static final String TEST_TRANSACTION_TABLE_NAME = "test transaction table name";
+    public static final String TEST_DATASET_NAME = "test dataset name";
+    public static final String TEST_FLOW_CONTROL_COUNT = "1000";
+    public static final String TEST_FLOW_CONTROL_BYTES = "100";
+    public static final String TEST_CONSUMER_TOPIC_NAME = "test";
+    public static final String MESSAGE_BODY = "sample message body";
+    public static final String TEST_PAYLOAD = "payload";
+    public static final String TRANSACTION_TYPE_CONSUMER_ACK ="CONSUMER_ACK";
+    public static final String TRANSACTION_TYPE_CONSUMER_NACK ="CONSUMER_NACK";
+    private TestData() {
+        //Constant class
     }
 
-    protected List<Map<String, Object>> getRowMapperList() {
+    public static String getMessageId() {
+        return TEST_MESSAGE_ID;
+    }
+
+    public static List<Map<String, Object>> getRowMapperList() {
         List<Map<String, Object>> rowMapperList = new ArrayList<>();
-        for(int i=0;i<3;i++){
-            Map<String, Object> rowMap= new LinkedHashMap<>();
-            rowMap.put("id", TestConstants.TEST_ELM_ID);
-            rowMap.put("source_id",TestConstants.TEST_SOURCE_TRANSACTION_ID);
-            rowMap.put("facility_id", TestConstants.TEST_FACILITY_ID);
-            rowMap.put("metrics",TestConstants.TEST_METRICS);
+        for (int i = 0; i < 3; i++) {
+            Map<String, Object> rowMap = new LinkedHashMap<>();
+            rowMap.put(ELM_ID, TEST_COLUMN_VALUE);
+            rowMap.put(BQ_CREATE_DTTM, TEST_COLUMN_VALUE);
+            rowMap.put(CONTRACT_VERSION, TEST_COLUMN_VALUE);
+            rowMap.put(SOURCE, TEST_COLUMN_VALUE);
+            rowMap.put(EVENT_TYPE, TEST_COLUMN_VALUE);
+            rowMap.put(PLATFORM, TEST_COLUMN_VALUE);
+            rowMap.put(DC_NUMBER, TEST_COLUMN_VALUE);
+            rowMap.put(ACTIVITY, TEST_COLUMN_VALUE);
+            rowMap.put(ACTION, TEST_COLUMN_VALUE);
+            rowMap.put(TRACE_ID, TEST_COLUMN_VALUE);
+            rowMap.put(TASK_ID, TEST_COLUMN_VALUE);
+            rowMap.put(PARTITION_DATE, TEST_COLUMN_VALUE);
+            rowMap.put(PUBLISH_TIMESTAMP, TEST_COLUMN_VALUE);
+            rowMap.put(USER_ID, TEST_COLUMN_VALUE);
+            rowMap.put(LDAP_ID, TEST_COLUMN_VALUE);
+            rowMap.put(TRANSACTION_ID, TEST_COLUMN_VALUE);
+            rowMap.put(ASSIGNED_VEHICLE, TEST_COLUMN_VALUE);
+            rowMap.put(VEHICLE_ID, TEST_COLUMN_VALUE);
+            rowMap.put(PARENT_LPN_ID, TEST_COLUMN_VALUE);
+            rowMap.put(LPN_NUMBER, TEST_COLUMN_VALUE);
+            rowMap.put(CONTAINER_TYPE, TEST_COLUMN_VALUE);
+            rowMap.put(TRANSACTION_TIMESTAMP, TEST_COLUMN_VALUE);
+            rowMap.put(START_LOCATION, TEST_COLUMN_VALUE);
+            rowMap.put(END_LOCATION, TEST_COLUMN_VALUE);
+            rowMap.put(START_ZONE, TEST_COLUMN_VALUE);
+            rowMap.put(END_ZONE, TEST_COLUMN_VALUE);
+            rowMap.put(START_LOCATION_TYPE, TEST_COLUMN_VALUE);
+            rowMap.put(END_LOCATION_TYPE, TEST_COLUMN_VALUE);
+            rowMap.put(PICK_AREA, TEST_COLUMN_VALUE);
+            rowMap.put(PUT_AREA, TEST_COLUMN_VALUE);
+            rowMap.put(SKU_NUMBER, TEST_COLUMN_VALUE);
+            rowMap.put(BUILD_ID, TEST_COLUMN_VALUE);
+            rowMap.put(SKU_DESCRIPTION, TEST_COLUMN_VALUE);
+            rowMap.put(DEPARTMENT, TEST_COLUMN_VALUE);
+            rowMap.put(SKU_CLASS, TEST_COLUMN_VALUE);
+            rowMap.put(SKU_SUB_CLASS, TEST_COLUMN_VALUE);
+            rowMap.put(WEIGHT, TEST_COLUMN_VALUE);
+            rowMap.put(LENGTH, TEST_COLUMN_VALUE);
+            rowMap.put(WIDTH, TEST_COLUMN_VALUE);
+            rowMap.put(HEIGHT, TEST_COLUMN_VALUE);
+            rowMap.put(VOLUME, TEST_COLUMN_VALUE);
+            rowMap.put(WEIGHT_UOM, TEST_COLUMN_VALUE);
+            rowMap.put(SIZE_UOM, TEST_COLUMN_VALUE);
+            rowMap.put(PACKAGE_UNIT_QTY, TEST_COLUMN_VALUE);
+            rowMap.put(PACKAGE_EACH_QTY, TEST_COLUMN_VALUE);
+            rowMap.put(SPECIAL_HANDLING, TEST_COLUMN_VALUE);
+            rowMap.put(BUILD_ON_METHOD, TEST_COLUMN_VALUE);
+            rowMap.put(SECURE_METHOD, TEST_COLUMN_VALUE);
+            rowMap.put(UNLOAD_TYPE, TEST_COLUMN_VALUE);
+            rowMap.put(LOCATION_UOM, TEST_COLUMN_VALUE);
+            rowMap.put(LOCATION_QTY, TEST_COLUMN_VALUE);
+            rowMap.put(UOM_QTY, TEST_COLUMN_VALUE);
+            rowMap.put(REASON_CODE, TEST_COLUMN_VALUE);
+            rowMap.put(INBOUND_OUTBOUND_INDICATOR, TEST_COLUMN_VALUE);
+            rowMap.put(ORDER_CATEGORY, TEST_COLUMN_VALUE);
+            rowMap.put(SHIPMENT_NUMBER, TEST_COLUMN_VALUE);
+            rowMap.put(SHIPMENT_TYPE_ID, TEST_COLUMN_VALUE);
+            rowMap.put(SHIPMENT_ROUTE, TEST_COLUMN_VALUE);
+            rowMap.put(SHIPMENT_STOP, TEST_COLUMN_VALUE);
+            rowMap.put(STORE_NUMBER, TEST_COLUMN_VALUE);
+            rowMap.put(SERVICE_TYPE, TEST_COLUMN_VALUE);
+            rowMap.put(VENDOR_NUMBER, TEST_COLUMN_VALUE);
+            rowMap.put(TRAILER_NUMBER, TEST_COLUMN_VALUE);
+            rowMap.put(RAIL_CAR_NUMBER, TEST_COLUMN_VALUE);
+            rowMap.put(SCAC, TEST_COLUMN_VALUE);
+            rowMap.put(LPN_STATUS, TEST_COLUMN_VALUE);
+            rowMap.put(SHIPMENT_LPN_ERROR_TYPE, TEST_COLUMN_VALUE);
+            rowMap.put(MHE_LOADED, TEST_COLUMN_VALUE);
             rowMapperList.add(rowMap);
         }
         return rowMapperList;
     }
 
-    protected List<Map<String, Object>> getEmptyRowMapperList() {
+    public static List<Map<String, Object>> getEmptyRowMapperList() {
         return new ArrayList<>();
     }
 
-    protected Map<Long, List<BigQueryError>> getInsertErrorMap() {
+    public static Map<Long, List<BigQueryError>> getInsertErrorMap() {
         Map<Long, List<BigQueryError>> errorMap = new HashMap<>();
         errorMap.put(0L, List.of(new BigQueryError("reason1", "location1", "message1")));
         errorMap.put(1L, List.of(new BigQueryError("reason2", "location2", null)));
         return errorMap;
     }
 
-    protected String getEmptyPayload() {
-        return TestConstants.TEST_EMPTY_PAYLOAD;
+    public static String getEmptyPayload() {
+        return TEST_EMPTY_PAYLOAD;
     }
 
-    protected String getTextPayload() {
-        return TestConstants.TEST_TEXT_PAYLOAD;
+    public static String getTextPayload() {
+        return TEST_TEXT_PAYLOAD;
     }
 
-    protected String getValidJsonPayloadPickLpnFromActive() throws IOException {
+    public static String getValidJsonPayloadPickLpnFromActive() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/data-pick-lpn-from-active.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getValidJsonPayloadReplenAllocation() throws IOException {
+    public static String getValidJsonPayloadReplenAllocation() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/data-replen-allocation.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getValidJsonPayloadIndirect() throws IOException {
+    public static String getValidJsonPayloadIndirect() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/indirect-data.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getValidJsonPayloadwWithMultipleBuilds() throws IOException {
+    public static String getValidJsonPayloadwWithMultipleBuilds() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/data-with-complex-list.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getInvalidFieldsJsonPayload() throws IOException {
+    public static String getInvalidFieldsJsonPayload() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/data-with-invalid-fields.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getInvalidBuildsJsonPayload() throws IOException {
+    public static String getInvalidBuildsJsonPayload() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/data-with-invalid-builds.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getDuplicateBuildsJsonPayload() throws IOException {
+    public static String getDuplicateBuildsJsonPayload() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/data-with-duplicate-builds.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getInvalidPackageHierarchyJsonPayload() throws IOException {
+    public static String getInvalidPackageHierarchyJsonPayload() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/data-with-invalid-package-hierarchy.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getDuplicatePackageHierarchyJsonPayload() throws IOException {
+    public static String getDuplicatePackageHierarchyJsonPayload() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/data-with-duplicate-package-hierarchy.json"), StandardCharsets.UTF_8);
     }
 
-    protected String getInvalidEventTypeJsonPayload() throws IOException {
+    public static String getInvalidEventTypeJsonPayload() throws IOException {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/indirect-data-with-invalid-event_type.json"), StandardCharsets.UTF_8);
-    }
-
-    protected Schema getElmSchema() {
-        return Schema.of(
-                Field.of(ELM_ID, StandardSQLTypeName.STRING),
-                Field.of(BQ_CREATE_DTTM,StandardSQLTypeName.TIMESTAMP),
-                Field.of(CONTRACT_VERSION,StandardSQLTypeName.STRING),
-                Field.of(SOURCE,StandardSQLTypeName.STRING),
-                Field.of(EVENT_TYPE,StandardSQLTypeName.STRING),
-                Field.of(PLATFORM,StandardSQLTypeName.STRING),
-                Field.of(DC_NUMBER,StandardSQLTypeName.STRING),
-                Field.of(ACTIVITY,StandardSQLTypeName.STRING),
-                Field.of(ACTION,StandardSQLTypeName.STRING),
-                Field.of(TRACE_ID,StandardSQLTypeName.STRING),
-                Field.of(TASK_ID,StandardSQLTypeName.STRING),
-                Field.of(PARTITION_DATE,StandardSQLTypeName.DATE),
-                Field.of(PUBLISH_TIMESTAMP,StandardSQLTypeName.TIMESTAMP),
-                Field.of(USER_ID,StandardSQLTypeName.STRING),
-                Field.of(LDAP_ID,StandardSQLTypeName.STRING),
-                Field.of(TRANSACTION_ID,StandardSQLTypeName.STRING),
-                Field.of(ASSIGNED_VEHICLE,StandardSQLTypeName.STRING),
-                Field.of(VEHICLE_ID,StandardSQLTypeName.STRING),
-                Field.of(PARENT_LPN_ID,StandardSQLTypeName.STRING),
-                Field.of(LPN_NUMBER,StandardSQLTypeName.STRING),
-                Field.of(CONTAINER_TYPE,StandardSQLTypeName.STRING),
-                Field.of(TRANSACTION_TIMESTAMP,StandardSQLTypeName.TIMESTAMP),
-                Field.of(START_LOCATION,StandardSQLTypeName.STRING),
-                Field.of(END_LOCATION,StandardSQLTypeName.STRING),
-                Field.of(START_ZONE,StandardSQLTypeName.STRING),
-                Field.of(END_ZONE,StandardSQLTypeName.STRING),
-                Field.of(START_LOCATION_TYPE,StandardSQLTypeName.STRING),
-                Field.of(END_LOCATION_TYPE,StandardSQLTypeName.STRING),
-                Field.of(PICK_AREA,StandardSQLTypeName.STRING),
-                Field.of(PUT_AREA,StandardSQLTypeName.STRING),
-                Field.of(SKU_NUMBER,StandardSQLTypeName.STRING),
-                Field.of(BUILD_ID,StandardSQLTypeName.STRING),
-                Field.of(SKU_DESCRIPTION,StandardSQLTypeName.STRING),
-                Field.of(DEPARTMENT,StandardSQLTypeName.STRING),
-                Field.of(SKU_CLASS,StandardSQLTypeName.STRING),
-                Field.of(SKU_SUB_CLASS,StandardSQLTypeName.STRING),
-                Field.of(WEIGHT,StandardSQLTypeName.NUMERIC),
-                Field.of(LENGTH,StandardSQLTypeName.NUMERIC),
-                Field.of(WIDTH,StandardSQLTypeName.NUMERIC),
-                Field.of(HEIGHT,StandardSQLTypeName.NUMERIC),
-                Field.of(VOLUME,StandardSQLTypeName.NUMERIC),
-                Field.of(WEIGHT_UOM,StandardSQLTypeName.STRING),
-                Field.of(SIZE_UOM,StandardSQLTypeName.STRING),
-                Field.of(PACKAGE_UNIT_QTY,StandardSQLTypeName.NUMERIC),
-                Field.of(PACKAGE_EACH_QTY,StandardSQLTypeName.NUMERIC),
-                Field.of(SPECIAL_HANDLING,StandardSQLTypeName.STRING),
-                Field.of(BUILD_ON_METHOD,StandardSQLTypeName.STRING),
-                Field.of(SECURE_METHOD,StandardSQLTypeName.STRING),
-                Field.of(UNLOAD_TYPE,StandardSQLTypeName.STRING),
-                Field.of(LOCATION_UOM,StandardSQLTypeName.STRING),
-                Field.of(LOCATION_QTY,StandardSQLTypeName.NUMERIC),
-                Field.of(UOM_QTY,StandardSQLTypeName.NUMERIC),
-                Field.of(REASON_CODE,StandardSQLTypeName.STRING),
-                Field.of(INBOUND_OUTBOUND_INDICATOR,StandardSQLTypeName.STRING),
-                Field.of(ORDER_CATEGORY,StandardSQLTypeName.STRING),
-                Field.of(SHIPMENT_NUMBER,StandardSQLTypeName.STRING),
-                Field.of(SHIPMENT_TYPE_ID,StandardSQLTypeName.STRING),
-                Field.of(SHIPMENT_ROUTE,StandardSQLTypeName.STRING),
-                Field.of(SHIPMENT_STOP,StandardSQLTypeName.STRING),
-                Field.of(STORE_NUMBER,StandardSQLTypeName.STRING),
-                Field.of(SERVICE_TYPE,StandardSQLTypeName.STRING),
-                Field.of(VENDOR_NUMBER,StandardSQLTypeName.STRING),
-                Field.of(TRAILER_NUMBER,StandardSQLTypeName.STRING),
-                Field.of(RAIL_CAR_NUMBER,StandardSQLTypeName.STRING),
-                Field.of(SCAC,StandardSQLTypeName.STRING),
-                Field.of(LPN_STATUS,StandardSQLTypeName.STRING),
-                Field.of(SHIPMENT_LPN_ERROR_TYPE,StandardSQLTypeName.STRING),
-                Field.of(MHE_LOADED,StandardSQLTypeName.STRING)
-        );
-    }
-
-    protected String getSelectAllQuery(String datasetID, String tableName){
-        return String.format("SELECT * FROM %s.%s", datasetID, tableName);
     }
 }
