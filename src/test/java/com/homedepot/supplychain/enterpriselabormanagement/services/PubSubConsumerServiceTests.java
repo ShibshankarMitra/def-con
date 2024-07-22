@@ -10,24 +10,15 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import com.homedepot.supplychain.enterpriselabormanagement.utils.TestConstants;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(SpringExtension.class)
 class PubSubConsumerServiceTests extends TestData {
     @InjectMocks
     PubSubConsumerService pubSubConsumerService;
-
-    @Mock
-    PubSubPublisherService pubSubPublisherService;
-
     @Mock
     private ElmTransactionBigQueryService elmTransactionBigQueryService;
     @Mock
@@ -36,7 +27,6 @@ class PubSubConsumerServiceTests extends TestData {
     private ArgumentCaptor<List<Map<String, Object>>> rowsCaptor;
     @BeforeEach()
     public void setUp() {
-
     }
 
     @Test()
@@ -240,33 +230,4 @@ class PubSubConsumerServiceTests extends TestData {
         //Verifying that message was never acknowledged only once
         Mockito.verify(message, Mockito.times(0)).ack();
     }
-
-    @Test()
-    @DisplayName("test- Message with Valid JSON Data Failed to publish to r2r-consumer Topic")
-    void testProcessMessageWithPublishingException() throws IOException {
-
-        String messageId = super.getMessageId();
-        String messageBody = super.getValidJsonPayloadPickLpnFromActive();
-        Mockito.doNothing().when(elmTransactionBigQueryService).insertAll(ArgumentMatchers.anyList());
-        ReflectionTestUtils.setField(pubSubConsumerService, "projectId", TestConstants.TEST_PROJECT_ID);
-        ReflectionTestUtils.setField(pubSubConsumerService, "consumerAckTopicName", TestConstants.TEST_CONSUMER_TOPIC_NAME);
-        Mockito.doThrow(RuntimeException.class).when(pubSubPublisherService).publishToTopic(anyString(), anyString(), anyString());
-        Assertions.assertThrows(ElmSystemException.class, () -> pubSubConsumerService.processPubSubToBq(messageId, messageBody, message));
-        Mockito.verify(message, Mockito.times(1)).ack();
-
-    }
-
-    @Test()
-    @DisplayName("test- Message with Valid JSON Data Successful publish to r2r-consumer Topic")
-    void testProcessMessageWithOutPublishingException() throws IOException {
-        String messageId = super.getMessageId();
-        String messageBody = super.getValidJsonPayloadPickLpnFromActive();
-        Mockito.doNothing().when(elmTransactionBigQueryService).insertAll(ArgumentMatchers.anyList());
-        ReflectionTestUtils.setField(pubSubConsumerService, "projectId", TestConstants.TEST_PROJECT_ID);
-        ReflectionTestUtils.setField(pubSubConsumerService, "consumerAckTopicName", TestConstants.TEST_CONSUMER_TOPIC_NAME);
-        Mockito.doNothing().when(pubSubPublisherService).publishToTopic(anyString(), anyString(), anyString());
-        Assertions.assertDoesNotThrow(() -> pubSubConsumerService.processPubSubToBq(messageId, messageBody, message));
-        Mockito.verify(message, Mockito.times(1)).ack();
-    }
-
 }

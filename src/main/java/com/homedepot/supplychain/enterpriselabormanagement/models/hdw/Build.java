@@ -14,7 +14,7 @@ public class Build {
     @JsonProperty("build_id")
     private String buildId;
     @JsonProperty("sku")
-    private int sku;
+    private String sku;
     @JsonProperty("package_hierarchy")
     private List<PackageHierarchy> packageHierarchies;
 

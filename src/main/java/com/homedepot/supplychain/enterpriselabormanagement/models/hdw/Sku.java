@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Sku {
     @JsonProperty("sku_number")
-    private int skuNumber;
+    private String skuNumber;
     @JsonProperty("build_id")
     private String buildId;
     @JsonProperty("sku_description")

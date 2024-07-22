@@ -1,12 +1,19 @@
 package com.homedepot.supplychain.enterpriselabormanagement.utils;
 
 import com.google.cloud.bigquery.BigQueryError;
+import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.Schema;
+import com.google.cloud.bigquery.StandardSQLTypeName;
+import com.homedepot.supplychain.enterpriselabormanagement.constants.ElmTransactionBqHeaders;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static com.homedepot.supplychain.enterpriselabormanagement.constants.ElmTransactionBqHeaders.*;
 
 public class TestData {
 
@@ -86,4 +93,80 @@ public class TestData {
         return FileUtils.readFileToString(new File("src/test/resources/json-test-data/indirect-data-with-invalid-event_type.json"), StandardCharsets.UTF_8);
     }
 
+    protected Schema getElmSchema() {
+        return Schema.of(
+                Field.of(ELM_ID, StandardSQLTypeName.STRING),
+                Field.of(BQ_CREATE_DTTM,StandardSQLTypeName.TIMESTAMP),
+                Field.of(CONTRACT_VERSION,StandardSQLTypeName.STRING),
+                Field.of(SOURCE,StandardSQLTypeName.STRING),
+                Field.of(EVENT_TYPE,StandardSQLTypeName.STRING),
+                Field.of(PLATFORM,StandardSQLTypeName.STRING),
+                Field.of(DC_NUMBER,StandardSQLTypeName.STRING),
+                Field.of(ACTIVITY,StandardSQLTypeName.STRING),
+                Field.of(ACTION,StandardSQLTypeName.STRING),
+                Field.of(TRACE_ID,StandardSQLTypeName.STRING),
+                Field.of(TASK_ID,StandardSQLTypeName.STRING),
+                Field.of(PARTITION_DATE,StandardSQLTypeName.DATE),
+                Field.of(PUBLISH_TIMESTAMP,StandardSQLTypeName.TIMESTAMP),
+                Field.of(USER_ID,StandardSQLTypeName.STRING),
+                Field.of(LDAP_ID,StandardSQLTypeName.STRING),
+                Field.of(TRANSACTION_ID,StandardSQLTypeName.STRING),
+                Field.of(ASSIGNED_VEHICLE,StandardSQLTypeName.STRING),
+                Field.of(VEHICLE_ID,StandardSQLTypeName.STRING),
+                Field.of(PARENT_LPN_ID,StandardSQLTypeName.STRING),
+                Field.of(LPN_NUMBER,StandardSQLTypeName.STRING),
+                Field.of(CONTAINER_TYPE,StandardSQLTypeName.STRING),
+                Field.of(TRANSACTION_TIMESTAMP,StandardSQLTypeName.TIMESTAMP),
+                Field.of(START_LOCATION,StandardSQLTypeName.STRING),
+                Field.of(END_LOCATION,StandardSQLTypeName.STRING),
+                Field.of(START_ZONE,StandardSQLTypeName.STRING),
+                Field.of(END_ZONE,StandardSQLTypeName.STRING),
+                Field.of(START_LOCATION_TYPE,StandardSQLTypeName.STRING),
+                Field.of(END_LOCATION_TYPE,StandardSQLTypeName.STRING),
+                Field.of(PICK_AREA,StandardSQLTypeName.STRING),
+                Field.of(PUT_AREA,StandardSQLTypeName.STRING),
+                Field.of(SKU_NUMBER,StandardSQLTypeName.STRING),
+                Field.of(BUILD_ID,StandardSQLTypeName.STRING),
+                Field.of(SKU_DESCRIPTION,StandardSQLTypeName.STRING),
+                Field.of(DEPARTMENT,StandardSQLTypeName.STRING),
+                Field.of(SKU_CLASS,StandardSQLTypeName.STRING),
+                Field.of(SKU_SUB_CLASS,StandardSQLTypeName.STRING),
+                Field.of(WEIGHT,StandardSQLTypeName.NUMERIC),
+                Field.of(LENGTH,StandardSQLTypeName.NUMERIC),
+                Field.of(WIDTH,StandardSQLTypeName.NUMERIC),
+                Field.of(HEIGHT,StandardSQLTypeName.NUMERIC),
+                Field.of(VOLUME,StandardSQLTypeName.NUMERIC),
+                Field.of(WEIGHT_UOM,StandardSQLTypeName.STRING),
+                Field.of(SIZE_UOM,StandardSQLTypeName.STRING),
+                Field.of(PACKAGE_UNIT_QTY,StandardSQLTypeName.NUMERIC),
+                Field.of(PACKAGE_EACH_QTY,StandardSQLTypeName.NUMERIC),
+                Field.of(SPECIAL_HANDLING,StandardSQLTypeName.STRING),
+                Field.of(BUILD_ON_METHOD,StandardSQLTypeName.STRING),
+                Field.of(SECURE_METHOD,StandardSQLTypeName.STRING),
+                Field.of(UNLOAD_TYPE,StandardSQLTypeName.STRING),
+                Field.of(LOCATION_UOM,StandardSQLTypeName.STRING),
+                Field.of(LOCATION_QTY,StandardSQLTypeName.NUMERIC),
+                Field.of(UOM_QTY,StandardSQLTypeName.NUMERIC),
+                Field.of(REASON_CODE,StandardSQLTypeName.STRING),
+                Field.of(INBOUND_OUTBOUND_INDICATOR,StandardSQLTypeName.STRING),
+                Field.of(ORDER_CATEGORY,StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_NUMBER,StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_TYPE_ID,StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_ROUTE,StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_STOP,StandardSQLTypeName.STRING),
+                Field.of(STORE_NUMBER,StandardSQLTypeName.STRING),
+                Field.of(SERVICE_TYPE,StandardSQLTypeName.STRING),
+                Field.of(VENDOR_NUMBER,StandardSQLTypeName.STRING),
+                Field.of(TRAILER_NUMBER,StandardSQLTypeName.STRING),
+                Field.of(RAIL_CAR_NUMBER,StandardSQLTypeName.STRING),
+                Field.of(SCAC,StandardSQLTypeName.STRING),
+                Field.of(LPN_STATUS,StandardSQLTypeName.STRING),
+                Field.of(SHIPMENT_LPN_ERROR_TYPE,StandardSQLTypeName.STRING),
+                Field.of(MHE_LOADED,StandardSQLTypeName.STRING)
+        );
+    }
+
+    protected String getSelectAllQuery(String datasetID, String tableName){
+        return String.format("SELECT * FROM %s.%s", datasetID, tableName);
+    }
 }

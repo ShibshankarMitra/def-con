@@ -32,7 +32,7 @@ public final class TransactionUtils {
         location.getSkus().forEach(sku -> {
             String locationUom= location.getLocationUom();
             String buildId=sku.getBuildId();
-            int skuNumber=sku.getSkuNumber();
+            String skuNumber=sku.getSkuNumber();
             List<Build> filteredBuilds = builds.stream().filter(build -> (Objects.equals(build.getBuildId(), buildId) && Objects.equals(build.getSku(), skuNumber))).toList();
             if(filteredBuilds.isEmpty()) {
                 throw new DataProcessingException(String.format("No builds found with build_id %s sku %s", buildId, skuNumber));

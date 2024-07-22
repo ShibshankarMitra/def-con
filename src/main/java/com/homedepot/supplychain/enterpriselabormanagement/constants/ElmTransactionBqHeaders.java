@@ -38,8 +38,8 @@ public final class ElmTransactionBqHeaders {
     public static final String BUILD_ID="build_id";
     public static final String SKU_DESCRIPTION="sku_description";
     public static final String DEPARTMENT="department";
-    public static final String CLASS="sku_class";
-    public static final String SUB_CLASS="sku_sub_class";
+    public static final String SKU_CLASS ="sku_class";
+    public static final String SKU_SUB_CLASS ="sku_sub_class";
     public static final String WEIGHT="weight";
     public static final String LENGTH="length";
     public static final String WIDTH="width";

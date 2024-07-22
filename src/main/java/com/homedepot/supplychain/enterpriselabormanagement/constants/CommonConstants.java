@@ -4,13 +4,11 @@ public final class CommonConstants {
 
 
     //ELM APPLICATION CONSTANTS
-    public static final String ELM_APP = "FULL-ELM";
     public static final String FILE_PATH_DELIMITER="/";
     public static final String JSON_SCHEMA_DIRECTORY ="json-schema";
     public static final String HDW_DIRECT_SCHEMA_FILE_NAME= "hdw-transaction-direct-schema.json";
     public static final String HDW_INDIRECT_SCHEMA_FILE_NAME= "hdw-transaction-indirect-schema.json";
     public static final String BIG_QUERY_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS";
-    public static final String FULL_ELM_R2R_DATETIME_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss.SS'Z'";
     public static final String BIG_QUERY_DATE_FORMAT = "yyyy-MM-dd";
     //PubSub Flow Control settings
     public static final Integer BYTE_MULTIPLIER = 1024;

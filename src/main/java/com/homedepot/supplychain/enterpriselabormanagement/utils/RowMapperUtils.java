@@ -82,8 +82,8 @@ public final class RowMapperUtils {
                         row.put(BUILD_ID, sku.getBuildId());
                         row.put(SKU_DESCRIPTION, sku.getSkuDescription());
                         row.put(DEPARTMENT, sku.getDepartment());
-                        row.put(CLASS, sku.getSkuClass());
-                        row.put(SUB_CLASS, sku.getSkuSubClass());
+                        row.put(SKU_CLASS, sku.getSkuClass());
+                        row.put(SKU_SUB_CLASS, sku.getSkuSubClass());
                         row.put(WEIGHT, sku.getWeight());
                         row.put(LENGTH, sku.getLength());
                         row.put(WIDTH, sku.getWidth());

@@ -1,7 +1,5 @@
 package com.homedepot.supplychain.enterpriselabormanagement.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homedepot.supplychain.enterpriselabormanagement.constants.CommonConstants;
 
 import java.math.BigDecimal;
@@ -37,10 +35,4 @@ public final class CommonUtils {
         return UUID.randomUUID().toString();
     }
 
-    public static String convertToJsonMessage(Object object) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(object);
-    }
-    public static String convertTimeStampToR2rFormat(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern(CommonConstants.FULL_ELM_R2R_DATETIME_FORMATTER));
-    }
 }
