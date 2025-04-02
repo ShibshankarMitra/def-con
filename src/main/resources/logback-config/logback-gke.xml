@@ -1,26 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <target>System.out</target>
+<configuration debug="true">
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <springProperty scope="context" name="springAppVersion" source="spring.application.version"/>
+    <contextName>${springAppName}</contextName>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
-                <timestamp><fieldName>timestamp</fieldName></timestamp>
-                <loggerName/>
-                <logLevel><fieldName>severity</fieldName></logLevel>
-                <message />
-                <stackTrace/>
+                <timestamp>
+                    <fieldName>timestamp</fieldName>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <logLevel>
+                    <fieldName>severity</fieldName>
+                </logLevel>
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+                <mdc/>
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+                <message>
+                    <fieldName>message</fieldName>
+                </message>
+                <throwableClassName>
+                    <fieldName>exceptionClass</fieldName>
+                </throwableClassName>
+                <stackTrace>
+                    <fieldName>stackTrace</fieldName>
+                    <!-- maxLength - limit the length of the stack trace -->
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <maxDepthPerThrowable>200</maxDepthPerThrowable>
+                        <maxLength>5000</maxLength>
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
             </providers>
         </encoder>
     </appender>
-    <appender name="GKE_STDOUT" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="STDOUT"/>
-    </appender>
-    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <root level="INFO">
-        <appender-ref ref="GKE_STDOUT"/>
+        <appender-ref ref="console"/>
     </root>
-
 </configuration>

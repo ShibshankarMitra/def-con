@@ -1,0 +1,9 @@
+CREATE MATERIALIZED VIEW IF NOT EXISTS `pr-sc-distribution.elm_integration.elm_events_view`
+PARTITION BY partition_date
+CLUSTER BY dc_number
+OPTIONS(
+  enable_refresh=true,
+  refresh_interval_minutes=30
+)
+AS
+SELECT trace_id, partition_date, dc_number FROM `pr-sc-distribution.elm_integration.elm_events`;

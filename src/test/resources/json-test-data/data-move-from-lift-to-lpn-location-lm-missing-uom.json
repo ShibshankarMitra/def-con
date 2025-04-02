@@ -1,0 +1,337 @@
+{
+  "laborEvent": {
+    "schemaUrl": "https://thd.atlassian.net/wiki/spaces/SCD/pages/2400094559/HDW-ELM+Event+Json+Schema",
+    "contract_version": "0.1",
+    "source": "HDW",
+    "platform": "BDC",
+    "dc_number": "5830",
+    "activity": "MOVE_FROM_LIFT_TO_LPN_LOCATION_LM",
+    "action": "MOVE_FROM_LIFT_TO_LPN_LOCATION_LM",
+    "event_type": "DIRECT",
+    "publish_timestamp": "2024-10-24T23:24:30.628",
+    "trace_id": "b601b5560d95216a6b05acebc57177be"
+  },
+  "laborEventDetail": {
+    "user_id": "amy_l_burrell@homedepot.com",
+    "ldap_id": "c1vrmfm",
+    "transaction_id": "12487384139412228",
+    "vehicle": {
+      "assigned_vehicle": "BinPickPushcart",
+      "vehicle_id": "19"
+    },
+    "lpns": [
+      {
+        "container_type": "",
+        "locations": [
+          {
+            "end_location": "CS2-2O-002",
+            "end_location_type": "STG",
+            "end_zone": "CS2",
+            "inbound_outbound_indicator": "O",
+            "location_qty": "",
+            "location_uom": "PL",
+            "lpn_status": "",
+            "mhe_loaded": "Y",
+            "order_category": "CUSTOMER",
+            "pick_area": "STG",
+            "put_area": "CS2",
+            "rail_car_number": "",
+            "reason_code": "",
+            "scac": "",
+            "service_type": "",
+            "shipment_lpn_error_type": "",
+            "shipment_number": "",
+            "shipment_route": "",
+            "shipment_stop": "0",
+            "shipment_type_id": "",
+            "skus": [
+              {
+                "build_id": "dc616f27-67e2-4582-acc4-d700d9242c00",
+                "build_on_method": "",
+                "sku_class": "7",
+                "department": "21",
+                "secure_method": "",
+                "sku_description": "STAIRWIZARDVINYLANGLEBRACKETKIT",
+                "sku_number": "513390",
+                "special_handling": "",
+                "sku_sub_class": "7",
+                "unload_type": "",
+                "quantity": "2",
+                "vendor_number": "99999"
+              },
+              {
+                "build_id": "a3c0040f-e328-491c-b190-34ed70acd98a",
+                "build_on_method": "",
+                "sku_class": "3",
+                "department": "25",
+                "secure_method": "",
+                "sku_description": "TREXHIDDENDECKCOMBOBUCKET,360CT",
+                "sku_number": "1006422035",
+                "special_handling": "",
+                "sku_sub_class": "23",
+                "unload_type": "",
+                "quantity": "1",
+                "vendor_number": "99999"
+              },
+              {
+                "build_id": "acc4ef2f-f5ae-4be8-9170-011fdd11ced5",
+                "build_on_method": "",
+                "sku_class": "7",
+                "department": "21",
+                "secure_method": "",
+                "sku_description": "4X4-39\\\"VINYLTRADDECKPOSTJACKET",
+                "sku_number": "312387",
+                "special_handling": "",
+                "sku_sub_class": "7",
+                "unload_type": "",
+                "quantity": "16",
+                "vendor_number": "99999"
+              },
+              {
+                "build_id": "aff04e3a-cfc3-4278-af65-48c050434028",
+                "build_on_method": "",
+                "sku_class": "3",
+                "department": "25",
+                "secure_method": "",
+                "sku_description": "TREXUNIVHIDDENDECKCOMBO,90CT",
+                "sku_number": "513114",
+                "special_handling": "",
+                "sku_sub_class": "23",
+                "unload_type": "",
+                "quantity": "1",
+                "vendor_number": "99999"
+              }
+            ],
+            "start_location": "CS2-2O-002",
+            "start_location_type": "STG",
+            "start_zone": "CS2",
+            "store_number": "CUST",
+            "trailer_number": "",
+            "transaction_timestamp": "2024-10-24T23:24:30.400",
+            "uom_qty": "1",
+            "vendor_number": ""
+          }
+        ],
+        "lpn_number": "58301180670",
+        "parent_lpn_id": ""
+      },
+      {
+        "container_type": "",
+        "locations": [
+          {
+            "end_location": "CS2-2O-002",
+            "end_location_type": "STG",
+            "end_zone": "CS2",
+            "inbound_outbound_indicator": "O",
+            "location_qty": "",
+            "location_uom": "PL",
+            "lpn_status": "",
+            "mhe_loaded": "Y",
+            "order_category": "CUSTOMER",
+            "pick_area": "STG",
+            "put_area": "CS2",
+            "rail_car_number": "",
+            "reason_code": "",
+            "scac": "",
+            "service_type": "",
+            "shipment_lpn_error_type": "",
+            "shipment_number": "",
+            "shipment_route": "",
+            "shipment_stop": "0",
+            "shipment_type_id": "",
+            "skus": [
+              {
+                "build_id": "9d2d0700-b593-4225-8e37-2956a71d5311",
+                "build_on_method": "",
+                "sku_class": "9",
+                "department": "22",
+                "secure_method": "",
+                "sku_description": "60LBSAKRETECONCRETEMIX",
+                "sku_number": "666249",
+                "special_handling": "",
+                "sku_sub_class": "2",
+                "unload_type": "",
+                "quantity": "40",
+                "vendor_number": "99999"
+              }
+            ],
+            "start_location": "CS2-2O-001",
+            "start_location_type": "STG",
+            "start_zone": "CS2",
+            "store_number": "CUST",
+            "trailer_number": "",
+            "transaction_timestamp": "2024-10-24T23:24:30.400",
+            "uom_qty": "1",
+            "vendor_number": ""
+          }
+        ],
+        "lpn_number": "5853173921",
+        "parent_lpn_id": ""
+      }
+    ],
+    "builds": [
+      {
+        "build_id": "dc616f27-67e2-4582-acc4-d700d9242c00",
+        "package_hierarchy": [
+          {
+            "depth": 48,
+            "height": 39,
+            "hierarchy_level_code": "PL",
+            "package_each_qty": "360",
+            "package_unit_qty": "360",
+            "size_uom": "IN",
+            "weight": 307.33300,
+            "weight_uom": "LB",
+            "width": 45
+          },
+          {
+            "depth": 10.19999,
+            "height": 2.650000,
+            "hierarchy_level_code": "EA",
+            "package_each_qty": "1",
+            "package_unit_qty": "1",
+            "size_uom": "IN",
+            "weight": 0.58999,
+            "weight_uom": "LB",
+            "width": 9.69999
+          },
+          {
+            "depth": 16.39999,
+            "height": 8.949999,
+            "hierarchy_level_code": "CA",
+            "package_each_qty": "6",
+            "package_unit_qty": "6",
+            "size_uom": "IN",
+            "weight": 4.4600000,
+            "weight_uom": "LB",
+            "width": 8.1000003
+          }
+        ],
+        "sku": "513390"
+      },
+      {
+        "build_id": "a3c0040f-e328-491c-b190-34ed70acd98a",
+        "package_hierarchy": [
+          {
+            "depth": 9.8999996,
+            "height": 5.30000019,
+            "hierarchy_level_code": "EA",
+            "package_each_qty": "1",
+            "package_unit_qty": "0",
+            "size_uom": "IN",
+            "weight": 5.34000,
+            "weight_uom": "LB",
+            "width": 8.05000
+          },
+          {
+            "depth": 19.75,
+            "height": 11,
+            "hierarchy_level_code": "CA",
+            "package_each_qty": "4",
+            "package_unit_qty": "0",
+            "size_uom": "IN",
+            "weight": 22,
+            "weight_uom": "LB",
+            "width": 8.380000
+          },
+          {
+            "depth": 19.799999,
+            "height": 31.79999,
+            "hierarchy_level_code": "PL",
+            "package_each_qty": "54",
+            "package_unit_qty": "0",
+            "size_uom": "IN",
+            "weight": 288.3599,
+            "weight_uom": "LB",
+            "width": 24.149999
+          }
+        ],
+        "sku": "1006422035"
+      },
+      {
+        "build_id": "acc4ef2f-f5ae-4be8-9170-011fdd11ced5",
+        "package_hierarchy": [
+          {
+            "depth": 43.875,
+            "height": 19,
+            "hierarchy_level_code": "PL",
+            "package_each_qty": "44",
+            "package_unit_qty": "44",
+            "size_uom": "IN",
+            "weight": 142.119995,
+            "weight_uom": "LB",
+            "width": 39
+          },
+          {
+            "depth": 39,
+            "height": 4,
+            "hierarchy_level_code": "EA",
+            "package_each_qty": "1",
+            "package_unit_qty": "1",
+            "size_uom": "IN",
+            "weight": 3.227999,
+            "weight_uom": "LB",
+            "width": 4
+          }
+        ],
+        "sku": "312387"
+      },
+      {
+        "build_id": "aff04e3a-cfc3-4278-af65-48c050434028",
+        "package_hierarchy": [
+          {
+            "depth": 6.400000,
+            "height": 3.049999,
+            "hierarchy_level_code": "EA",
+            "package_each_qty": "1",
+            "package_unit_qty": "1.0",
+            "size_uom": "IN",
+            "weight": 1.6200000,
+            "weight_uom": "LB",
+            "width": 5.550000
+          },
+          {
+            "depth": 6.400000,
+            "height": 19.29999,
+            "hierarchy_level_code": "CA",
+            "package_each_qty": "6",
+            "package_unit_qty": "2",
+            "size_uom": "IN",
+            "weight": 9.5,
+            "weight_uom": "LB",
+            "width": 6.0999999
+          }
+        ],
+        "sku": "513114"
+      },
+      {
+        "build_id": "9d2d0700-b593-4225-8e37-2956a71d5311",
+        "package_hierarchy": [
+          {
+            "depth": 48,
+            "height": 34,
+            "hierarchy_level_code": "PL",
+            "package_each_qty": "56",
+            "package_unit_qty": "56",
+            "size_uom": "IN",
+            "weight": 3360,
+            "weight_uom": "LB",
+            "width": 40
+          },
+          {
+            "depth": 17.5,
+            "height": 4.5,
+            "hierarchy_level_code": "EA",
+            "package_each_qty": "1",
+            "package_unit_qty": "1",
+            "size_uom": "IN",
+            "weight": 60,
+            "weight_uom": "LB",
+            "width": 15
+          }
+        ],
+        "sku": "666249"
+      }
+    ]
+  }
+}

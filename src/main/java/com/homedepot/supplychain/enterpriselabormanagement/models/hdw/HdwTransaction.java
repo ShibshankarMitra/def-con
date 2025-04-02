@@ -4,14 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Map;
-
 @Getter
 @Setter
 @NoArgsConstructor
 public class HdwTransaction {
-    @JsonProperty("attributes")
-    private Map<String, Object> attributes;
-    @JsonProperty("data")
-    private Data data;
+    @JsonProperty("laborEvent")
+    private LaborEvent laborEvent;
+    @JsonProperty("laborEventDetail")
+    private Data laborEventDetail;
 }

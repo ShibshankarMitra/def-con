@@ -14,6 +14,10 @@ public class Lpn {
     private String parentLpnId;
     @JsonProperty("lpn_number")
     private String lpnNumber;
+    @JsonProperty("crossdock")
+    private String crossdock;
+    @JsonProperty("receiving_type")
+    private String receivingType;
     @JsonProperty("container_type")
     private String containerType;
     @JsonProperty("locations")

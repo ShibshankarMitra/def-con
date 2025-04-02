@@ -1,0 +1,34 @@
+MERGE INTO
+  `elm_datamart.facility` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.facility`
+) AS src
+ON
+  dest.facility_id = src.facility_id
+  WHEN MATCHED AND dest.updated != src.updated THEN UPDATE SET client_id= src.client_id, client_name= src.client_name, facility_id= src.facility_id, facility_name= src.facility_name, effective_date= src.effective_date, missing_time_process_name= src.missing_time_process_name, status_quo_els= src.status_quo_els, status_quo_indirect= src.status_quo_indirect, status_quo_missing= src.status_quo_missing, labor_burden= src.labor_burden, bonus_load= src.bonus_load, created= src.created, updated= src.updated, created_by= src.created_by, updated_by= src.updated_by, bq_update_ts= CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  (client_id,
+    client_name,
+    facility_id,
+    facility_name,
+    effective_date,
+    missing_time_process_name,
+    status_quo_els,
+    status_quo_indirect,
+    status_quo_missing,
+    labor_burden,
+    bonus_load,
+    created,
+    updated,
+    created_by,
+    updated_by,
+    bq_create_ts,
+    bq_update_ts)
+VALUES
+  (src.client_id, src.client_name, src.facility_id, src.facility_name, src.effective_date, src.missing_time_process_name, src.status_quo_els, src.status_quo_indirect, src.status_quo_missing, src.labor_burden, src.bonus_load, src.created, src.updated, src.created_by, src.updated_by, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

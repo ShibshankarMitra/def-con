@@ -1,0 +1,83 @@
+MERGE INTO
+  `elm_datamart.cost_breakdown` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.cost_breakdown`
+  WHERE
+    item_date BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 14 DAY) AND CURRENT_DATE()
+) AS src
+ON
+  dest.facility_id = src.facility_id
+  AND dest.item_id = src.item_id
+  AND dest.employee_id = src.employee_id
+  AND (dest.metric = src.metric or (dest.metric is null and src.metric is null))
+  WHEN MATCHED AND dest.updated != src.updated THEN UPDATE SET client_id = src.client_id, item_date= src.item_date, year_num= src.year_num, month_num= src.month_num, day_num= src.day_num, week_num= src.week_num, month_name= src.month_name, day_name= src.day_name, item_number= src.item_number, item_id=src.item_id, employee_id=src.employee_id, client= src.client, facility= src.facility, department= src.department, process= src.process, metric=src.metric, category= src.category, shift= src.shift, supervisor=src.supervisor, employee=src.employee, employee_code= src.employee_code, direct_hours= src.direct_hours, direct_cost= src.direct_cost, indirect_hours= src.indirect_hours, indirect_cost= src.indirect_cost, billable_hours= src.billable_hours, billable_cost= src.billable_cost, els=src.els, els_hours= src.els_hours, earned_hours= src.earned_hours, missing_hours=src.missing_hours, missing_cost= src.missing_cost, units=src.units, unit_cost=src.unit_cost, labor_cost= src.labor_cost, overtime_cost=src.overtime_cost, bonus_cost=src.bonus_cost, total_cost= src.total_cost, tiers= src.tiers, created= src.created, updated= src.updated, department_code= src.department_code, department_std_code= src.department_std_code, process_code= src.process_code, process_std_code = src.process_std_code, metric_std_code= src.metric_std_code, reference_id= src.reference_id, tiers_json= src.tiers_json, employee_type = src.employee_type, user_defined_1= src.user_defined_1, user_defined_2= src.user_defined_2, user_defined_3= src.user_defined_3, user_defined_4= src.user_defined_4, isthroughput= src.isthroughput, facility_id= src.facility_id, created_by=src.created_by, updated_by= src.updated_by, baseline_direct_cost= src.baseline_direct_cost, bq_update_ts= CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  ( id,
+    client_id,
+    item_date,
+    year_num,
+    month_num,
+    day_num,
+    week_num,
+    month_name,
+    day_name,
+    item_number,
+    item_id,
+    employee_id,
+    client,
+    facility,
+    department,
+    process,
+    metric,
+    category,
+    shift,
+    supervisor,
+    employee,
+    employee_code,
+    direct_hours,
+    direct_cost,
+    indirect_hours,
+    indirect_cost,
+    billable_hours,
+    billable_cost,
+    els,
+    els_hours,
+    earned_hours,
+    missing_hours,
+    missing_cost,
+    units,
+    unit_cost,
+    labor_cost,
+    overtime_cost,
+    bonus_cost,
+    total_cost,
+    tiers,
+    created,
+    updated,
+    department_code,
+    department_std_code,
+    process_code,
+    process_std_code,
+    metric_std_code,
+    reference_id,
+    tiers_json,
+    employee_type,
+    user_defined_1,
+    user_defined_2,
+    user_defined_3,
+    user_defined_4,
+    isthroughput,
+    facility_id,
+    created_by,
+    updated_by,
+    baseline_direct_cost,
+    bq_create_ts,
+    bq_update_ts )
+VALUES
+  (src.id, src.client_id, src.item_date, src.year_num, src.month_num, src.day_num, src.week_num, src.month_name, src.day_name, src.item_number, src.item_id, src.employee_id, src.client, src.facility, src.department, src.process, src.metric, src.category, src.shift, src.supervisor, src.employee, src.employee_code, src.direct_hours, src.direct_cost, src.indirect_hours, src.indirect_cost, src.billable_hours, src.billable_cost, src.els, src.els_hours, src.earned_hours, src.missing_hours, src.missing_cost, src.units, src.unit_cost, src.labor_cost, src.overtime_cost, src.bonus_cost, src.total_cost, src.tiers, src.created, src.updated, src.department_code, src.department_std_code, src.process_code, src.process_std_code, src.metric_std_code, src.reference_id, src.tiers_json,src.employee_type, src.user_defined_1, src.user_defined_2, src.user_defined_3, src.user_defined_4, src.isthroughput, src.facility_id, src.created_by, src.updated_by, src.baseline_direct_cost, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

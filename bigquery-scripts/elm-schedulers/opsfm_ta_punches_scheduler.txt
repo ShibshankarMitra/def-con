@@ -1,0 +1,163 @@
+WITH
+  PUNCH_PPL_TEMP AS (
+  SELECT
+    DISTINCT PUNCH.partitionDate AS punch_date,
+    PUNCH.personId AS PERSON_ID,
+    PUNCH.orderNumber,
+    PUNCH.startDateTime AS Punch_StartDTM,
+    PUNCH.endDateTime AS Punch_EndDTM,
+    PUNCH.segmentTypeId,
+    PPL.userName AS LDAP_ID,
+    CONCAT(COALESCE(PPL.lastName, ''), ", ", COALESCE(PPL.firstName, ''), " ", COALESCE(PPL.middleName, '')) AS Full_Name,
+    PPL.timeZone,
+    LEFT(groupSchedule, 4) AS DC_NUMBER,
+    DPR.punchReason AS PUNCH_REASON
+  FROM
+    `pr-hr-wfm-services.thd_pr_sharedviews.vwTimeCardProcessSegments` PUNCH
+  JOIN
+    `pr-hr-wfm-services.thd_pr_sharedviews.vwPeople` PPL
+  ON
+    PUNCH.personId = PPL.personId
+  LEFT JOIN
+    `pr-hr-wfm-services.thd_pr_sharedviews.vwDimPunchReason` AS DPR
+  ON
+    PUNCH.segmentTypeId = DPR.segmentTypeId
+  WHERE
+    LEFT(groupSchedule, 4) IN ('5853',
+      '5987',
+      '5897',
+      '5898',
+      '5840',
+      '5824',
+      '5914',
+      '5865',
+      '5856',
+      '5977',
+      '5928',
+      '5830',
+      '5859',
+      '5955',
+      '5942',
+      '5943',
+      '5978')
+    AND PUNCH.partitionDate BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY)
+    AND CURRENT_DATE() )
+SELECT
+  *
+FROM (
+  SELECT
+    punch_groups.LDAP_ID AS USER_ID,
+    punch_groups.Full_Name AS USER_NAME,
+    MIN(punch_groups.punch_date) OVER (PARTITION BY LDAP_ID, grp) AS PUNCH_DATE,
+    'IN' AS PUNCH_TYPE,
+    CASE
+      WHEN (punch_groups.Punch_Reason IS NULL) THEN 'NORMAL'
+      ELSE punch_groups.Punch_Reason
+  END
+    AS PUNCH_REASON,
+    punch_groups.orderNumber AS ORDER_NUMBER,
+    punch_groups.Punch_StartDTM AS PUNCH_LOCAL_TIME,
+    DATETIME(FORMAT_TIMESTAMP('%Y-%m-%dT%H:%M:%S', TIMESTAMP(punch_groups.Punch_StartDTM, SUBSTR(punch_groups.TimeZone, 6, 6 )))) AS PUNCH_UTC_TIME,
+    punch_groups.DC_NUMBER
+  FROM (
+    SELECT
+      punch_start_sequence.LDAP_ID,
+      punch_start_sequence.Full_Name,
+      punch_start_sequence.punch_date,
+      punch_start_sequence.Punch_StartDTM AS Punch_StartDTM,
+      punch_start_sequence.Punch_EndDTM AS Punch_EndDTM,
+      punch_start_sequence.orderNumber AS orderNumber,
+      punch_start_sequence.punch_reason AS punch_reason,
+      punch_start_sequence.Timezone,
+      punch_start_sequence.DC_NUMBER,
+      -- Increment the group no: for every new set of punch orderNumbers
+      SUM(punch_start_sequence.reset_flag) OVER (PARTITION BY punch_start_sequence.LDAP_ID ORDER BY punch_start_sequence.punch_date, punch_start_sequence.Punch_StartDTM, punch_start_sequence.orderNumber) AS Grp
+    FROM (
+      SELECT
+        PP.LDAP_ID,
+        PP.Full_Name,
+        PP.punch_date,
+        PP.Punch_StartDTM,
+        PP.Punch_EndDTM,
+        PP.orderNumber,
+        PP.timeZone,
+        PP.PUNCH_REASON,
+        PP.DC_NUMBER,
+        CASE
+          WHEN orderNumber = 1 THEN 1
+          ELSE 0
+      END
+        AS reset_flag
+      FROM
+        PUNCH_PPL_TEMP PP
+      WHERE
+        -- Condition to avoid breaks
+        PP.PUNCH_REASON IS NULL
+        -- Condition to avoid future punches
+        AND TIMESTAMP(PP.Punch_StartDTM, SUBSTR(PP.timeZone, 6, 6 )) <= CURRENT_TIMESTAMP()
+        AND TIMESTAMP(PP.Punch_EndDTM, SUBSTR(PP.timeZone, 6, 6 )) <= CURRENT_TIMESTAMP()
+      ORDER BY
+        PP.punch_date,
+        PP.Punch_StartDTM ) AS punch_start_sequence ) AS punch_groups
+  UNION ALL
+  SELECT
+    punch_groups.LDAP_ID AS USER_ID,
+    punch_groups.Full_Name AS USER_NAME,
+    MIN(punch_groups.punch_date) OVER (PARTITION BY LDAP_ID, grp) AS PUNCH_DATE,
+    'OUT' AS PUNCH_TYPE,
+    CASE
+      WHEN (punch_groups.Punch_Reason IS NULL) THEN 'NORMAL'
+      ELSE punch_groups.Punch_Reason
+  END
+    AS PUNCH_REASON,
+    punch_groups.orderNumber AS ORDER_NUMBER,
+    punch_groups.Punch_EndDTM AS PUNCH_LOCAL_TIME,
+    DATETIME(FORMAT_TIMESTAMP('%Y-%m-%dT%H:%M:%S', TIMESTAMP(punch_groups.Punch_EndDTM, SUBSTR(punch_groups.TimeZone, 6, 6 )))) AS PUNCH_UTC_TIME,
+    punch_groups.DC_NUMBER
+  FROM (
+    SELECT
+      punch_start_sequence.LDAP_ID,
+      punch_start_sequence.Full_Name,
+      punch_start_sequence.punch_date,
+      punch_start_sequence.Punch_StartDTM AS Punch_StartDTM,
+      punch_start_sequence.Punch_EndDTM AS Punch_EndDTM,
+      punch_start_sequence.orderNumber AS orderNumber,
+      punch_start_sequence.punch_reason AS punch_reason,
+      punch_start_sequence.Timezone,
+      punch_start_sequence.DC_NUMBER,
+      -- Increment the group no: for every new set of punch orderNumbers
+      SUM(punch_start_sequence.reset_flag) OVER (PARTITION BY punch_start_sequence.LDAP_ID ORDER BY punch_start_sequence.punch_date, punch_start_sequence.Punch_StartDTM, punch_start_sequence.orderNumber) AS Grp
+    FROM (
+      SELECT
+        PP.LDAP_ID,
+        PP.Full_Name,
+        PP.punch_date,
+        PP.Punch_StartDTM,
+        PP.Punch_EndDTM,
+        PP.orderNumber,
+        PP.timeZone,
+        PP.PUNCH_REASON,
+        PP.DC_NUMBER,
+        CASE
+          WHEN orderNumber = 1 THEN 1
+          ELSE 0
+      END
+        AS reset_flag
+      FROM
+        PUNCH_PPL_TEMP PP
+      WHERE
+        -- Condition to avoid breaks
+        PP.PUNCH_REASON IS NULL -- Condition to avoid future punches
+        AND TIMESTAMP(PP.Punch_StartDTM, SUBSTR(PP.timeZone, 6, 6 )) <= CURRENT_TIMESTAMP()
+        AND TIMESTAMP(PP.Punch_EndDTM, SUBSTR(PP.timeZone, 6, 6 )) <= CURRENT_TIMESTAMP()
+      ORDER BY
+        PP.punch_date,
+        PP.Punch_StartDTM ) AS punch_start_sequence ) AS punch_groups
+  ORDER BY
+    PUNCH_DATE,
+    USER_ID,
+    PUNCH_LOCAL_TIME,
+    ORDER_NUMBER )MN
+  -- Condition to remove cross-midnight punch rows
+WHERE
+  TIME(MN.PUNCH_LOCAL_TIME) != '00:00:00'

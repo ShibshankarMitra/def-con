@@ -5,9 +5,9 @@ import com.google.api.core.ApiFutures;
 import com.google.api.gax.core.CredentialsProvider;
 import com.google.api.gax.rpc.TransportChannelProvider;
 import com.google.cloud.pubsub.v1.Publisher;
-import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
+import com.homedepot.supplychain.enterpriselabormanagement.exceptions.ElmSystemException;
 import com.homedepot.supplychain.enterpriselabormanagement.utils.TestData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -24,10 +24,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 
+import static com.homedepot.supplychain.enterpriselabormanagement.utils.TestData.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(SpringExtension.class)
@@ -41,8 +40,15 @@ class PubSubPublisherServiceTests {
     CredentialsProvider defaultCredentialsProvider;
     @Mock
     private Publisher.Builder mockPublisherBuilder;
+    @Mock
+    private PubsubMessage pubsubMessage;
+    @Mock
+    private Run2RunService run2RunService;
+    @Mock
+    private ApiFuture<String> apiFuture;
     MockedStatic<ProjectTopicName> mockStaticProjectTopic;
     MockedStatic<Publisher> mockStaticPublisher;
+
     @BeforeEach
     public void beforeEach() {
         ReflectionTestUtils.setField(pubSubPublisherService, "defaultTransportChannelProvider", defaultTransportChannelProvider);
@@ -54,17 +60,17 @@ class PubSubPublisherServiceTests {
     @Test
     void testPublishToTopicSuccessful() throws IOException {
         // Mock dependencies (replace with mocks for Publisher and ApiFuture)
-        ProjectTopicName  projectTopicName = ProjectTopicName.of(TestData.TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME);
-        when(ProjectTopicName.of(TestData.TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME)).thenReturn(projectTopicName);
+        ProjectTopicName  projectTopicName = ProjectTopicName.of(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME);
+        when(ProjectTopicName.of(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME)).thenReturn(projectTopicName);
         Publisher mockPublisher = mock(Publisher.class);
         when(mockPublisherBuilder.build()).thenReturn(mockPublisher);
         when(mockPublisherBuilder.setChannelProvider(any(TransportChannelProvider.class))).thenReturn(mockPublisherBuilder);
         when(mockPublisherBuilder.setCredentialsProvider(any(CredentialsProvider.class))).thenReturn(mockPublisherBuilder);
         when(Publisher.newBuilder(projectTopicName)).thenReturn(mockPublisherBuilder);
         ApiFuture<String> myFuture = ApiFutures.immediateFuture("test message id");
-        when(mockPublisher.publish(PubsubMessage.newBuilder().setData(ByteString.copyFromUtf8(TestData.MESSAGE_BODY)).build())).thenReturn(myFuture);
+        when(mockPublisher.publish(pubsubMessage)).thenReturn(myFuture);
         // Call the service method
-        pubSubPublisherService.publishToTopic(TestData.MESSAGE_BODY, TestData.TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME, TestData.TRANSACTION_TYPE_CONSUMER_ACK);
+        pubSubPublisherService.publishToTopic(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME, TestData.TEST_TRACE_ID, pubsubMessage);
         // Verify logging (if applicable)
         verify(mockPublisher).shutdown();
     }
@@ -72,12 +78,9 @@ class PubSubPublisherServiceTests {
     @Test
     void testPublishToTopicFailure() throws IOException {
         // Arrange
-        String messageBody = "Test message";
         String projectId = "test-project";
         String topicName = "test-topic";
         ProjectTopicName projectTopicName = ProjectTopicName.of(projectId, topicName);
-        ByteString byteString = ByteString.copyFromUtf8(messageBody);
-        PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(byteString).build();
         ApiFuture<String> future = ApiFutures.immediateFailedFuture(new RuntimeException("Failed to publish message"));
         Publisher mockPublisher = mock(Publisher.class);
         when(mockPublisher.publish(pubsubMessage)).thenReturn(future);
@@ -85,18 +88,72 @@ class PubSubPublisherServiceTests {
         when(mockPublisherBuilder.setChannelProvider(any(TransportChannelProvider.class))).thenReturn(mockPublisherBuilder);
         when(mockPublisherBuilder.setCredentialsProvider(any(CredentialsProvider.class))).thenReturn(mockPublisherBuilder);
         when(Publisher.newBuilder(projectTopicName)).thenReturn(mockPublisherBuilder);
-        pubSubPublisherService.publishToTopic(messageBody, projectId, topicName, TestData.TRANSACTION_TYPE_CONSUMER_NACK);
+        pubSubPublisherService.publishToTopic(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME, TestData.TEST_TRACE_ID, pubsubMessage);
         verify(mockPublisher).shutdown();
     }
 
     @Test
     void testPublishToTopicWithNullPublisher() throws IOException {
         // Mock dependencies (replace with mocks for Publisher and ApiFuture)
-        ProjectTopicName  projectTopicName = ProjectTopicName.of(TestData.TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME);
-        when(ProjectTopicName.of(TestData.TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME)).thenReturn(projectTopicName);
+        ProjectTopicName  projectTopicName = ProjectTopicName.of(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME);
+        when(ProjectTopicName.of(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME)).thenReturn(projectTopicName);
         when(mockPublisherBuilder.build()).thenReturn(null);
         when(Publisher.newBuilder(projectTopicName)).thenReturn(mockPublisherBuilder);
-        Assertions.assertThrows(NullPointerException.class,()->pubSubPublisherService.publishToTopic(TestData.MESSAGE_BODY, TestData.TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME, TestData.TRANSACTION_TYPE_CONSUMER_NACK));
+        Assertions.assertThrows(NullPointerException.class,()->pubSubPublisherService.publishToTopic(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME, TestData.TEST_TRACE_ID, pubsubMessage));
+    }
+
+
+
+    @Test
+    void testCreateAndPublishConsumerAckMessageDoesNotThrowElmSystemException() throws IOException {
+        ProjectTopicName  projectTopicName = ProjectTopicName.of(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME);
+        Publisher mockPublisher = mock(Publisher.class);
+        when(run2RunService.createConsumerAck(anyString(),anyString(),anyString())).thenReturn(pubsubMessage);
+        when(mockPublisherBuilder.build()).thenReturn(mockPublisher);
+        when(mockPublisherBuilder.setChannelProvider(any(TransportChannelProvider.class))).thenReturn(mockPublisherBuilder);
+        when(mockPublisherBuilder.setCredentialsProvider(any(CredentialsProvider.class))).thenReturn(mockPublisherBuilder);
+        when(Publisher.newBuilder(projectTopicName)).thenReturn(mockPublisherBuilder);
+        when(mockPublisher.publish(any())).thenReturn(apiFuture);
+        Assertions.assertDoesNotThrow(() -> pubSubPublisherService.createAndPublishConsumerAckMessage(TEST_DC_NUMBER, TestData.TEST_TRACE_ID));
+    }
+
+    @Test
+    void testCreateAndPublishConsumerAckMessageThrowElmSystemException() throws IOException {
+        ProjectTopicName  projectTopicName = ProjectTopicName.of(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME);
+        Publisher mockPublisher = mock(Publisher.class);
+        when(run2RunService.createConsumerAck(anyString(),anyString(),anyString())).thenReturn(pubsubMessage);
+        when(mockPublisherBuilder.build()).thenReturn(mockPublisher);
+        when(mockPublisherBuilder.setChannelProvider(any(TransportChannelProvider.class))).thenReturn(mockPublisherBuilder);
+        when(mockPublisherBuilder.setCredentialsProvider(any(CredentialsProvider.class))).thenReturn(mockPublisherBuilder);
+        when(Publisher.newBuilder(projectTopicName)).thenReturn(mockPublisherBuilder);
+        when(mockPublisher.publish(any())).thenThrow(ElmSystemException.class);
+        Assertions.assertThrows(ElmSystemException.class,() -> pubSubPublisherService.createAndPublishConsumerAckMessage(TEST_DC_NUMBER, TestData.TEST_TRACE_ID));
+    }
+
+    @Test
+    void testCreateAndPublishConsumerNackMessageDoesNotThrowElmSystemException() throws IOException {
+        ProjectTopicName  projectTopicName = ProjectTopicName.of(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME);
+        Publisher mockPublisher = mock(Publisher.class);
+        when(run2RunService.createConsumerAck(anyString(),anyString(),anyString())).thenReturn(pubsubMessage);
+        when(mockPublisherBuilder.build()).thenReturn(mockPublisher);
+        when(mockPublisherBuilder.setChannelProvider(any(TransportChannelProvider.class))).thenReturn(mockPublisherBuilder);
+        when(mockPublisherBuilder.setCredentialsProvider(any(CredentialsProvider.class))).thenReturn(mockPublisherBuilder);
+        when(Publisher.newBuilder(projectTopicName)).thenReturn(mockPublisherBuilder);
+        when(mockPublisher.publish(any())).thenReturn(apiFuture);
+        Assertions.assertDoesNotThrow(() -> pubSubPublisherService.createAndPublishConsumerNackMessage(TEST_DC_NUMBER, TestData.TEST_TRACE_ID, TEST_ERROR_MESSAGE));
+    }
+
+    @Test
+    void testCreateAndPublishConsumerNackMessageThrowElmSystemException() throws IOException {
+        ProjectTopicName  projectTopicName = ProjectTopicName.of(TEST_PROJECT_ID, TestData.TEST_CONSUMER_TOPIC_NAME);
+        when(run2RunService.createConsumerAck(anyString(),anyString(),anyString())).thenReturn(pubsubMessage);
+        Publisher mockPublisher = mock(Publisher.class);
+        when(mockPublisherBuilder.build()).thenReturn(mockPublisher);
+        when(mockPublisherBuilder.setChannelProvider(any(TransportChannelProvider.class))).thenReturn(mockPublisherBuilder);
+        when(mockPublisherBuilder.setCredentialsProvider(any(CredentialsProvider.class))).thenReturn(mockPublisherBuilder);
+        when(Publisher.newBuilder(projectTopicName)).thenReturn(mockPublisherBuilder);
+        when(mockPublisher.publish(any())).thenThrow(ElmSystemException.class);
+        Assertions.assertThrows(ElmSystemException.class, () -> pubSubPublisherService.createAndPublishConsumerNackMessage(TEST_DC_NUMBER, TestData.TEST_TRACE_ID, TEST_ERROR_MESSAGE));
     }
 
     @AfterEach

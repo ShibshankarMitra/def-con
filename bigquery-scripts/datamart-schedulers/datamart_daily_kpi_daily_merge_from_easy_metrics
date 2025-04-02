@@ -1,0 +1,84 @@
+MERGE INTO
+  `elm_datamart.daily_kpi` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.daily_kpi`
+WHERE
+    item_date BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 14 DAY) AND CURRENT_DATE()
+) AS src
+ON
+  dest.item_date = src.item_date
+  AND dest.facility_id = src.facility_id
+  AND dest.shift = src.shift
+  AND dest.supervisor = src.supervisor
+  AND dest.employee_id=src.employee_id
+  WHEN MATCHED AND dest.updated != src.updated THEN UPDATE SET client_id = src.client_id, facility_id= src.facility_id, item_date= src.item_date, year_num= src.year_num, month_num= src.month_num, day_num= src.day_num, week_num= src.week_num, month_name= src.month_name, day_name= src.day_name, client= src.client, facility= src.facility, shift= src.shift, supervisor=src.supervisor, employee_id= src.employee_id, employee= src.employee, employee_code= src.employee_code, employee_type= src.employee_type, direct_hours= src.direct_hours, direct_cost= src.direct_cost, indirect_hours= src.indirect_hours, indirect_percent= src.indirect_percent, indirect_cost= src.indirect_cost, billable_hours= src.billable_hours, billable_cost= src.billable_cost, els=src.els, els_hours= src.els_hours, qls= src.qls, daily_hours= src.daily_hours, timecard_hours=src.timecard_hours, missing_hours= src.missing_hours, missing_percent= src.missing_percent, missing_cost= src.missing_cost, overtime_hours=src.overtime_hours, overtime_cost=src.overtime_cost, effectiveness= src.effectiveness, utilization=src.utilization, earned_hours=src.earned_hours, effective_hours= src.effective_hours, productive_hours= src.productive_hours, total_hours= src.total_hours, els_bonus= src.els_bonus, trainer_bonus= src.trainer_bonus, supervisor_bonus= src.supervisor_bonus, reflective_bonus= src.reflective_bonus, custom_bonus = src.custom_bonus, custom_bonus_cost= src.custom_bonus_cost, total_bonus= src.total_bonus, goal_els= src.goal_els, goal_indirect = src.goal_indirect, goal_missing= src.goal_missing, created= src.created, updated= src.updated, period_els= src.period_els, period_qls= src.period_qls, lifetime_els= src.lifetime_els, bonus_pay=src.bonus_pay, unburdened_bonus_pay= src.unburdened_bonus_pay, created_by= src.created_by, updated_by= src.updated_by, bq_update_ts= CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  ( client_id,
+    facility_id,
+    item_date,
+    year_num,
+    month_num,
+    day_num,
+    week_num,
+    month_name,
+    day_name,
+    client,
+    facility,
+    shift,
+    supervisor,
+    employee_id,
+    employee,
+    employee_code,
+    employee_type,
+    direct_hours,
+    direct_cost,
+    indirect_hours,
+    indirect_percent,
+    indirect_cost,
+    billable_hours,
+    billable_cost,
+    els,
+    els_hours,
+    qls,
+    daily_hours,
+    timecard_hours,
+    missing_hours,
+    missing_percent,
+    missing_cost,
+    overtime_hours,
+    overtime_cost,
+    effectiveness,
+    utilization,
+    earned_hours,
+    effective_hours,
+    productive_hours,
+    total_hours,
+    els_bonus,
+    trainer_bonus,
+    supervisor_bonus,
+    reflective_bonus,
+    custom_bonus,
+    custom_bonus_cost,
+    total_bonus,
+    goal_els,
+    goal_indirect,
+    goal_missing,
+    created,
+    updated,
+    period_els,
+    period_qls,
+    lifetime_els,
+    bonus_pay,
+    unburdened_bonus_pay,
+    created_by,
+    updated_by,
+    bq_update_ts,
+    bq_create_ts )
+VALUES
+  (src.client_id, src.facility_id, src.item_date, src.year_num, src.month_num, src.day_num, src.week_num, src.month_name, src.day_name, src.client, src.facility, src.shift, src.supervisor, src.employee_id, src.employee, src.employee_code, src.employee_type, src.direct_hours, src.direct_cost, src.indirect_hours, src.indirect_percent, src.indirect_cost, src.billable_hours, src.billable_cost, src.els, src.els_hours, src.qls, src.daily_hours, src.timecard_hours, src.missing_hours, src.missing_percent, src.missing_cost, src.overtime_hours, src.overtime_cost, src.effectiveness, src.utilization, src.earned_hours, src.effective_hours, src.productive_hours, src.total_hours, src.els_bonus, src.trainer_bonus, src.supervisor_bonus, src.reflective_bonus, src.custom_bonus,src.custom_bonus_cost, src.total_bonus, src.goal_els, src.goal_indirect, src.goal_missing, src.created, src.updated, src.period_els, src.period_qls, src.lifetime_els, src.bonus_pay, src.unburdened_bonus_pay, src.created_by, src.updated_by, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

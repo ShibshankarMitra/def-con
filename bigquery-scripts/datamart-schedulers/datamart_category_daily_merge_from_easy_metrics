@@ -1,0 +1,31 @@
+MERGE INTO
+  `elm_datamart.category` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.category` ) AS src
+ON
+  dest.category_id = src.category_id
+  AND dest.facility_id = src.facility_id
+  AND dest.effective_date = src.effective_date
+  WHEN MATCHED AND dest.updated != src.updated THEN UPDATE SET client_id= src.client_id, client_name= src.client_name, facility_id= src.facility_id, facility_name= src.facility_name, category_id= src.category_id, category_name= src.category_name, effective_date= src.effective_date, created= src.created, updated= src.updated, created_by= src.created_by, updated_by= src.updated_by, bq_update_ts= CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  (client_id,
+    client_name,
+    facility_id,
+    facility_name,
+    category_id,
+    category_name,
+    effective_date,
+    created,
+    updated,
+    created_by,
+    updated_by,
+    bq_create_ts,
+    bq_update_ts)
+VALUES
+  (src.client_id, src.client_name, src.facility_id, src.facility_name, src.category_id, src.category_name, src.effective_date, src.created, src.updated, src.created_by, src.updated_by, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

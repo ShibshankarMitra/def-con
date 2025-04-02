@@ -36,7 +36,7 @@
   },
   "type": "object",
   "properties": {
-    "attributes": {
+    "laborEvent": {
       "type": "object",
       "properties": {
         "schemaUrl": {
@@ -94,7 +94,7 @@
         "trace_id"
       ]
     },
-    "data": {
+    "laborEventDetail": {
       "type": "object",
       "properties": {
         "user_id": {
@@ -123,7 +123,7 @@
     }
   },
   "required": [
-    "attributes",
-    "data"
+    "laborEvent",
+    "laborEventDetail"
   ]
 }

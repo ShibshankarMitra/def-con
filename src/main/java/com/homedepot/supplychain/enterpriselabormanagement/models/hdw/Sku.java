@@ -39,7 +39,13 @@ public class Sku {
     @JsonIgnore
     private String sizeUom;
     @JsonIgnore
-    private BigDecimal packageEachQty;
+    private BigDecimal packageEachQuantity;
+    @JsonIgnore
+    private BigDecimal packagePalletQuantity;
+    @JsonIgnore
+    private BigDecimal packageCaseQuantity;
+    @JsonIgnore
+    private BigDecimal packagePackQuantity;
     @JsonIgnore
     private BigDecimal packageUnitQty;
     @JsonProperty("special_handling")
@@ -50,4 +56,16 @@ public class Sku {
     private String secureMethod;
     @JsonProperty("unload_type")
     private String unloadType;
+    @JsonProperty("quantity")
+    private BigDecimal quantity;
+    @JsonProperty("vendor_number")
+    private String vendorNumber;
+    @JsonIgnore
+    private String skuBuildUom;
+    @JsonIgnore
+    private Boolean isMx;
+    @JsonProperty("asn_vendor_number")
+    private String asnVendorNumber;
+    @JsonProperty("buy_pack_quantity")
+    private String buyPackQuantity;
 }

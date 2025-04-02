@@ -45,7 +45,7 @@
   },
   "type": "object",
   "properties": {
-    "attributes": {
+    "laborEvent": {
       "type": "object",
       "properties": {
         "schemaUrl": {
@@ -107,7 +107,7 @@
         "trace_id"
       ]
     },
-    "data": {
+    "laborEventDetail": {
       "type": "object",
       "properties": {
         "user_id": {
@@ -126,10 +126,12 @@
           "type": "object",
           "properties": {
             "assigned_vehicle": {
-              "type": "string"
+              "type": "string",
+              "$ref": "#/definitions/nonEmptyString"
             },
             "vehicle_id": {
-              "type": "string"
+              "type": "string",
+              "$ref": "#/definitions/nonEmptyString"
             }
           },
           "required": [
@@ -148,6 +150,12 @@
               "lpn_number": {
                 "type": "string",
                 "$ref": "#/definitions/nonEmptyString"
+              },
+              "crossdock": {
+                "type": "boolean"
+              },
+              "receiving_type": {
+                "type": "string"
               },
               "container_type": {
                 "type": "string"
@@ -204,9 +212,6 @@
                             "type": "string",
                             "$ref": "#/definitions/nonEmptyString"
                           },
-                          "sku_description": {
-                            "type": "string"
-                          },
                           "department": {
                             "type": "string",
                             "$ref": "#/definitions/nonEmptyString"
@@ -219,6 +224,16 @@
                             "type": "string",
                             "$ref": "#/definitions/nonEmptyString"
                           },
+                          "quantity": {
+                            "type": "string",
+                            "$ref": "#/definitions/nonEmptyString"
+                          },
+                          "buy_pack_quantity": {
+                            "type": "string"
+                          },
+                          "sku_description": {
+                            "type": "string"
+                          },
                           "special_handling": {
                             "type": "string"
                           },
@@ -230,6 +245,12 @@
                           },
                           "unload_type": {
                             "type": "string"
+                          },
+                          "vendor_number": {
+                            "type": "string"
+                          },
+                          "asn_vendor_number": {
+                            "type": "string"
                           }
                         },
                         "required": [
@@ -237,15 +258,12 @@
                           "build_id",
                           "department",
                           "sku_class",
-                          "sku_sub_class"
+                          "sku_sub_class",
+                          "quantity"
                         ]
                       }
                     },
                     "location_uom": {
-                      "type": "string",
-                      "$ref": "#/definitions/nonEmptyString"
-                    },
-                    "location_qty": {
                       "type": "string",
                       "$ref": "#/definitions/nonEmptyString"
                     },
@@ -280,9 +298,6 @@
                     "service_type": {
                       "type": "string"
                     },
-                    "vendor_number": {
-                      "type": "string"
-                    },
                     "trailer_number": {
                       "type": "string"
                     },
@@ -312,7 +327,6 @@
                     "end_location_type",
                     "skus",
                     "location_uom",
-                    "location_qty",
                     "uom_qty",
                     "inbound_outbound_indicator"
                   ]
@@ -337,6 +351,9 @@
               "sku": {
                 "type": "string",
                 "$ref": "#/definitions/nonEmptyString"
+              },
+              "is_mx": {
+                "type": "boolean"
               },
               "package_hierarchy": {
                 "type": "array",
@@ -412,7 +429,7 @@
     }
   },
   "required": [
-    "attributes",
-    "data"
+    "laborEvent",
+    "laborEventDetail"
   ]
 }

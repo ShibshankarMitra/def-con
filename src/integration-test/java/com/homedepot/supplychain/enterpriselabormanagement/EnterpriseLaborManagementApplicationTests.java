@@ -23,7 +23,9 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.*;
 import com.homedepot.supplychain.enterpriselabormanagement.aspects.ExceptionAspect;
-import com.homedepot.supplychain.enterpriselabormanagement.exceptions.ElmBusinessException;
+import com.homedepot.supplychain.enterpriselabormanagement.constants.CommonConstants;
+import com.homedepot.supplychain.enterpriselabormanagement.constants.ElmTransactionBqHeaders;
+import com.homedepot.supplychain.enterpriselabormanagement.exceptions.ElmSystemException;
 import com.homedepot.supplychain.enterpriselabormanagement.services.PubSubConsumerService;
 import com.homedepot.supplychain.enterpriselabormanagement.utils.TestData;
 import com.homedepot.supplychain.enterpriselabormanagement.utils.TestUtils;
@@ -31,7 +33,10 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,14 +66,18 @@ import java.util.concurrent.TimeoutException;
 public class EnterpriseLaborManagementApplicationTests {
 
     private static final Logger ExceptionLogger = (Logger) LoggerFactory.getLogger(ExceptionAspect.class);
+    private static final Logger WarningLogger = (Logger) LoggerFactory.getLogger(PubSubConsumerService.class);
 
     private static final String PROJECT_ID = "test-project";
     private static final String ELM_TOPIC_NAME = "elm_topic_test";
+    private static final String CICO_TOPIC_NAME = "cico_topic_test";
     private static final String ELM_SUBSCRIPTION_ID = "elm_subscription_test";
+    private static final String CICO_SUBSCRIPTION_ID = "cico_subscription_test";
     private static final String R2R_TOPIC_NAME = "r2r_topic_test";
     private static final String R2R_SUBSCRIPTION_ID = "r2r_subscription_test";
     private static final String DATASET_ID = "elm_integration_test";
     private static final String TABLE_NAME = "elm_events_test";
+    private static final String VIEW_NAME = "elm_events_view_test";
 
     private ListAppender<ILoggingEvent> listAppender;
 
@@ -88,7 +97,7 @@ public class EnterpriseLaborManagementApplicationTests {
         registry.add("elm.gcp.bigquery.elm-transactions-table-name", () -> TABLE_NAME);
         registry.add("elm.gcp.pubsub.elm-transactions-subscription-name", () -> ELM_SUBSCRIPTION_ID);
         registry.add("elm-r2r.gcp.pubsub.r2r-consumer-ack-topic-name", () -> R2R_TOPIC_NAME);
-
+        registry.add("elm.gcp.bigquery.elm-view-name", () -> VIEW_NAME);
     }
 
     @TestConfiguration
@@ -141,12 +150,16 @@ public class EnterpriseLaborManagementApplicationTests {
     @Inject
     private PubSubConsumerService pubSubConsumerService;
 
-
-    //Creating GCP Resources before running end-to-end test
+    /**
+     * Creating GCP Resources before running end-to-end test
+     * @NOTE: As of now BigQuery Test Container does not supported to create Materialized View that why in functional tests we've used Logical View only for tests.
+     * In future if they add this feature then, We'll update it in the functional tests.
+     */
     @BeforeEach
     public void setup() throws Exception {
         initializePubSub();
         initializeBigQuerySchema();
+        initializeLogicalView();
         initializeLoggerCapture();
     }
 
@@ -154,6 +167,7 @@ public class EnterpriseLaborManagementApplicationTests {
         listAppender = new ListAppender<>();
         listAppender.start();
         ExceptionLogger.addAppender(listAppender);
+        WarningLogger.addAppender(listAppender);
     }
 
     private void initializePubSub() throws IOException {
@@ -171,10 +185,14 @@ public class EnterpriseLaborManagementApplicationTests {
         try {
             admin.deleteTopic(ELM_TOPIC_NAME);
             log.info("Topic deleted with name {}", ELM_TOPIC_NAME);
+            admin.deleteTopic(CICO_TOPIC_NAME);
+            log.info("Topic deleted with name {}", CICO_TOPIC_NAME);
             admin.deleteTopic(R2R_TOPIC_NAME);
             log.info("Topic deleted with name {}", R2R_TOPIC_NAME);
             admin.deleteSubscription(ELM_SUBSCRIPTION_ID);
             log.info("Subscription deleted with name {}", ELM_SUBSCRIPTION_ID);
+            admin.deleteSubscription(CICO_SUBSCRIPTION_ID);
+            log.info("Subscription deleted with name {}", CICO_SUBSCRIPTION_ID);
             admin.deleteSubscription(R2R_SUBSCRIPTION_ID);
             log.info("Subscription deleted with name {}", R2R_SUBSCRIPTION_ID);
         } catch (NotFoundException e) {
@@ -182,10 +200,14 @@ public class EnterpriseLaborManagementApplicationTests {
         }
         Topic elmTopic = admin.createTopic(ELM_TOPIC_NAME);
         log.info("Topic created with name {}", elmTopic.getName());
+        Topic cicoTopic = admin.createTopic(CICO_TOPIC_NAME);
+        log.info("Topic created with name {}", cicoTopic.getName());
         Topic r2rTopic = admin.createTopic(R2R_TOPIC_NAME);
         log.info("Topic created with name {}", r2rTopic.getName());
         Subscription elmSubscription = admin.createSubscription(ELM_SUBSCRIPTION_ID, ELM_TOPIC_NAME);
         log.info("Subscription created with name {} Listening to topic {} ", elmSubscription.getName(), elmTopic.getName());
+        Subscription cicoSubscription = admin.createSubscription(CICO_SUBSCRIPTION_ID, CICO_TOPIC_NAME);
+        log.info("Subscription created with name {} Listening to topic {} ", cicoSubscription.getName(), cicoTopic.getName());
         Subscription r2rSubscription = admin.createSubscription(R2R_SUBSCRIPTION_ID, R2R_TOPIC_NAME);
         log.info("Subscription created with name {} Listening to topic {} ", r2rSubscription.getName(), r2rTopic.getName());
         admin.close();
@@ -197,6 +219,16 @@ public class EnterpriseLaborManagementApplicationTests {
         log.info("Table '{}' removed", TABLE_NAME);
         bigquery.delete(DatasetId.of(bigqueryContainer.getProjectId(), DATASET_ID));
         log.info("Dataset '{}' removed", DATASET_ID);
+    }
+
+    private void clearLogicalView() {
+        try {
+            bigquery.query(QueryJobConfiguration.newBuilder("DROP VIEW " + DATASET_ID + "." + VIEW_NAME).build());
+            log.info("View {} dropped", VIEW_NAME);
+        } catch (InterruptedException | BigQueryException e) {
+            log.info("Error while deleting view: {}", e.toString());
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void initializeBigQuerySchema() {
@@ -211,19 +243,35 @@ public class EnterpriseLaborManagementApplicationTests {
         log.info("Table '{}' created", table.getTableId());
     }
 
+    /**
+     * Bigquery Emulator Test Container has a limitation that it does not support Materialized View, that why we used Logical View in functional test.
+     */
+    private void initializeLogicalView() {
+        try {
+            String query = String.format("SELECT trace_id, partition_date, dc_number FROM %s.%s.%s", PROJECT_ID,DATASET_ID, TABLE_NAME);
+            var tableId = TableId.of(PROJECT_ID, DATASET_ID, VIEW_NAME);
+            ViewDefinition viewDefinition = ViewDefinition.newBuilder(query).setUseLegacySql(false).build();
+            Table table = bigquery.create(TableInfo.of(tableId, viewDefinition));
+            log.info("Logical View '{}' created", table.getTableId());
+        } catch (BigQueryException e) {
+            log.info("Logical View not created {}", e.getMessage());
+        }
+    }
+
     @AfterEach
     public void tearDown() {
+        clearLogicalView();
         clearBigQuerySchema();
     }
 
-    private void publishToTopic(String message) throws IOException {
+    private void publishToTopic(String message, String topicName) throws IOException {
         Publisher publisher = null;
         try {
-            publisher = Publisher.newBuilder(TopicName.of(PROJECT_ID, ELM_TOPIC_NAME))
+            publisher = Publisher.newBuilder(TopicName.of(PROJECT_ID, topicName))
                     .setCredentialsProvider(NoCredentialsProvider.create())
                     .setChannelProvider(channelProvider)
                     .build();
-            ApiFuture<String> future = publisher.publish(PubsubMessage.newBuilder().setData(ByteString.copyFromUtf8(message)).build());
+            ApiFuture<String> future = publisher.publish(PubsubMessage.newBuilder().setData(ByteString.copyFromUtf8(message)).putAttributes(ElmTransactionBqHeaders.CONTRACT_VERSION, CommonConstants.CONTRACT_VERSION_DEFAULT).build());
             ApiFutures.addCallback(
                     future,
                     new ApiFutureCallback<>() {
@@ -245,27 +293,28 @@ public class EnterpriseLaborManagementApplicationTests {
         }
     }
 
-    private void listenToElmSubscription() {
+    private void listenToElmSubscription(String subscriptionId) {
         MessageReceiver receiver =
                 (PubsubMessage pubsubMessage, AckReplyConsumer consumer) -> {
                     BasicAcknowledgeablePubsubMessage originalMessage = convertToBasicAckPubSubMessage(pubsubMessage, consumer);
+                    String contractVersion = originalMessage.getPubsubMessage().getAttributesMap().get(ElmTransactionBqHeaders.CONTRACT_VERSION);
                     String messageId = originalMessage.getPubsubMessage().getMessageId();
                     String messageBody = originalMessage.getPubsubMessage().getData().toStringUtf8();
-                    log.info("Subscription: {} PubSub message received with ID: {} Payload: {}", ELM_SUBSCRIPTION_ID, messageId, messageBody);
+                    log.info("Subscription: {} PubSub message received with ID: {} Payload: {}", subscriptionId, messageId, messageBody);
                     try {
-                        pubSubConsumerService.processPubSubToBq(messageId, messageBody, originalMessage);
+                        pubSubConsumerService.processPubSubToBq(messageBody, originalMessage, contractVersion);
                     } catch (Exception ignored) {
                         //This is an empty catch block as exceptions are handled using aspect
                     }
                 };
         Subscriber subscriber = null;
         try {
-            subscriber = Subscriber.newBuilder(ProjectSubscriptionName.of(PROJECT_ID, ELM_SUBSCRIPTION_ID), receiver)
+            subscriber = Subscriber.newBuilder(ProjectSubscriptionName.of(PROJECT_ID, subscriptionId), receiver)
                     .setChannelProvider(channelProvider)
                     .setCredentialsProvider(NoCredentialsProvider.create())
                     .build();
             subscriber.startAsync().awaitRunning();
-            log.info("Listening to subscription {}", ELM_SUBSCRIPTION_ID);
+            log.info("Listening to subscription {}", subscriptionId);
             subscriber.awaitTerminated(5, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             subscriber.stopAsync();
@@ -333,23 +382,23 @@ public class EnterpriseLaborManagementApplicationTests {
 
     @Test
     public void testInvalidMessage() throws IOException, InterruptedException {
-        publishToTopic("Hello World");
-        listenToElmSubscription();
+        publishToTopic("Hello World", ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
         List<ILoggingEvent> logsList = listAppender.list;
         String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
         TableResult tableResult = runQuery(query);
         Assertions.assertEquals(0, tableResult.getTotalRows());
-        ILoggingEvent logEvent = logsList.get(0);
-        Assertions.assertEquals(logEvent.getLevel(), Level.ERROR);
-        Assertions.assertTrue(logEvent.getFormattedMessage().contains(ElmBusinessException.class.getSimpleName()));
+        ILoggingEvent logEvent = logsList.get(1);
+        Assertions.assertEquals(Level.ERROR, logEvent.getLevel());
+        Assertions.assertTrue(logEvent.getFormattedMessage().contains(ElmSystemException.class.getSimpleName()));
         listAppender.stop();
     }
 
     @Test
     public void testValidMessagePickLpnFromActive() throws IOException, InterruptedException, JSONException {
         String hdwMessage = TestData.getValidJsonPayloadPickLpnFromActive();
-        publishToTopic(hdwMessage);
-        listenToElmSubscription();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
         String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
         TableResult tableResult = runQuery(query);
         TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
@@ -359,8 +408,8 @@ public class EnterpriseLaborManagementApplicationTests {
     @Test
     public void testValidMessageReplenishmentAllocation() throws IOException, InterruptedException, JSONException {
         String hdwMessage = TestData.getValidJsonPayloadReplenAllocation();
-        publishToTopic(hdwMessage);
-        listenToElmSubscription();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
         String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
         TableResult tableResult = runQuery(query);
         TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
@@ -369,9 +418,9 @@ public class EnterpriseLaborManagementApplicationTests {
 
     @Test
     public void testValidMessageComplex() throws IOException, InterruptedException, JSONException {
-        String hdwMessage = TestData.getValidJsonPayloadwWithMultipleBuilds();
-        publishToTopic(hdwMessage);
-        listenToElmSubscription();
+        String hdwMessage = TestData.getValidJsonPayloadWithMultipleBuilds();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
         String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
         TableResult tableResult = runQuery(query);
         TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
@@ -381,11 +430,94 @@ public class EnterpriseLaborManagementApplicationTests {
     @Test
     public void testValidMessageIndirect() throws IOException, InterruptedException, JSONException {
         String hdwMessage = TestData.getValidJsonPayloadIndirect();
-        publishToTopic(hdwMessage);
-        listenToElmSubscription();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
         String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
         TableResult tableResult = runQuery(query);
         TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
         listenToR2RSubscription(hdwMessage);
     }
+
+    @Test
+    public void testValidMessageLoadLpnLm() throws IOException, InterruptedException, JSONException {
+        String hdwMessage = TestData.getValidJsonPayloadLoadLpnLm();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
+        String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
+        TableResult tableResult = runQuery(query);
+        TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
+        listenToR2RSubscription(hdwMessage);
+    }
+
+    @Test
+    public void testValidMessageMoveFromLiftToLpnLocationLm() throws IOException, InterruptedException, JSONException {
+        String hdwMessage = TestData.getValidJsonPayloadMoveFromLiftToLpnLocationLm();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
+        String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
+        TableResult tableResult = runQuery(query);
+        TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
+        listenToR2RSubscription(hdwMessage);
+    }
+
+    @Test
+    public void testValidMessageMoveToLiftLm() throws IOException, InterruptedException, JSONException {
+        String hdwMessage = TestData.getValidJsonPayloadMoveToLiftLm();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
+        String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
+        TableResult tableResult = runQuery(query);
+        TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
+        listenToR2RSubscription(hdwMessage);
+    }
+
+    @Test
+    public void testValidMessageReceiveLpnLm() throws IOException, InterruptedException, JSONException {
+        String hdwMessage = TestData.getValidJsonPayloadReceiveLpnLm();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
+        String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
+        TableResult tableResult = runQuery(query);
+        TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
+        listenToR2RSubscription(hdwMessage);
+    }
+
+    @Test
+    public void testValidMessageWithDuplicateTraceId() throws IOException, InterruptedException, JSONException {
+        String hdwMessage = TestData.getValidJsonPayloadPickLpnFromActive();
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
+        String query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
+        TableResult tableResult = runQuery(query);
+        TestUtils.assertTableResultsAgainstJson(tableResult, hdwMessage);
+        //Asserting that if traceId not exist then bigquery insertion will happen.
+        Assertions.assertEquals(1, tableResult.getTotalRows());
+        listenToR2RSubscription(hdwMessage);
+        //Same message published again
+        publishToTopic(hdwMessage, ELM_TOPIC_NAME);
+        listenToElmSubscription(ELM_SUBSCRIPTION_ID);
+        List<ILoggingEvent> logsList = listAppender.list;
+        query = TestUtils.getSelectAllQuery(DATASET_ID, TABLE_NAME);
+        tableResult = runQuery(query);
+        ILoggingEvent logEvent = logsList.get(3);
+        //Asserting that if traceId duplicate then bigquery insertion will not happen.
+        Assertions.assertEquals(1, tableResult.getTotalRows());
+        //Asserting WARN logs present in case of duplicate traceId found
+        Assertions.assertEquals(Level.WARN,logEvent.getLevel());
+        Assertions.assertTrue(logEvent.getFormattedMessage().contains("Duplicate message has been found"));
+        listenToR2RSubscription(hdwMessage);
+    }
+
+    @Test
+    public void testValidMessageCicoEvent() throws IOException {
+        String hdwMessage = TestData.getValidJsonPayloadCicoEvent();
+        publishToTopic(hdwMessage, CICO_TOPIC_NAME);
+        listenToElmSubscription(CICO_SUBSCRIPTION_ID);
+        List<ILoggingEvent> logsList = listAppender.list;
+        log.info("LogEvent: {}", logsList);
+        ILoggingEvent logEvent = logsList.get(0);
+        Assertions.assertEquals(Level.INFO, logEvent.getLevel());
+        Assertions.assertTrue(logEvent.getFormattedMessage().contains("Published message received for event_type: CICO"));
+    }
+
 }

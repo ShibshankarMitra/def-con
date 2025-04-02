@@ -21,7 +21,7 @@ public class ExceptionAspect {
         if (ex instanceof ElmSystemException e) {
             log.error("{}: {}, Source: {}", e.getClass().getSimpleName(), e.getMessage(), e.getSource(), e.getCause());
         } else if (ex instanceof ElmBusinessException e) {
-            log.error("{}: {}, PubSub_MessageID: {}", e.getClass().getSimpleName(), e.getMessage(), e.getMessageId(), ex.getCause());
+            log.error("{}: {}", e.getClass().getSimpleName(), e.getMessage(), ex.getCause());
         } else {
             log.error("{}: {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
         }

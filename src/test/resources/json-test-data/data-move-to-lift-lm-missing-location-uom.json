@@ -1,0 +1,108 @@
+{
+  "laborEvent": {
+    "schemaUrl": "https://thd.atlassian.net/wiki/spaces/SCD/pages/2400094559/HDW-ELM+Event+Json+Schema",
+    "contract_version": "0.1",
+    "source": "HDW",
+    "platform": "BDC",
+    "dc_number": "5942",
+    "activity": "MOVE_TO_LIFT_LM",
+    "action": "MOVE_TO_LIFT_LM",
+    "event_type": "DIRECT",
+    "publish_timestamp": "2024-10-31T20:33:52.732",
+    "trace_id": "27e30badd2091ddb6fd644993b364d0c"
+  },
+  "laborEventDetail": {
+    "user_id": "amanda_m_carey@homedepot.com",
+    "ldap_id": "t9bekkl",
+    "transaction_id": "12514568545167143",
+    "vehicle": {
+      "assigned_vehicle": "PacerTruck",
+      "vehicle_id": "10"
+    },
+    "lpns": [
+      {
+        "container_type": "",
+        "locations": [
+          {
+            "end_location": "STG-DD-212",
+            "end_location_type": "STG",
+            "end_zone": "STG",
+            "inbound_outbound_indicator": "I",
+            "location_qty": "",
+            "location_uom": "PL",
+            "lpn_status": "",
+            "mhe_loaded": "Y",
+            "order_category": "",
+            "pick_area": "STG",
+            "put_area": "SR",
+            "rail_car_number": "",
+            "reason_code": "",
+            "scac": "",
+            "service_type": "",
+            "shipment_lpn_error_type": "",
+            "shipment_number": "",
+            "shipment_route": "",
+            "shipment_stop": "",
+            "shipment_type_id": "",
+            "skus": [
+              {
+                "build_id": "93f587c8-5d77-4e7c-a62f-3a822b8d0eed",
+                "build_on_method": "",
+                "sku_class": "3",
+                "department": "22",
+                "secure_method": "",
+                "sku_description": "",
+                "sku_number": "678905",
+                "special_handling": "",
+                "sku_sub_class": "4",
+                "unload_type": "",
+                "quantity": "12",
+                "vendor_number": "99999"
+              }
+            ],
+            "start_location": "STG-DD-212",
+            "start_location_type": "STG",
+            "start_zone": "STG",
+            "store_number": "",
+            "trailer_number": "",
+            "transaction_timestamp": "2024-10-31T20:33:52.547",
+            "uom_qty": "0",
+            "vendor_number": ""
+          }
+        ],
+        "lpn_number": "L00000369519",
+        "parent_lpn_id": ""
+      }
+    ],
+    "builds": [
+      {
+        "build_id": "93f587c8-5d77-4e7c-a62f-3a822b8d0eed",
+        "package_hierarchy": [
+          {
+            "depth": 150,
+            "height": 4,
+            "hierarchy_level_code": "CA",
+            "package_each_qty": "12.0",
+            "package_unit_qty": "12.0",
+            "size_uom": "IN",
+            "weight": 53,
+            "weight_uom": "LB",
+            "width": 17
+          },
+          {
+            "depth": 144,
+            "height": 0.5,
+            "hierarchy_level_code": "EA",
+            "package_each_qty": "1",
+            "package_unit_qty": "1",
+            "size_uom": "IN",
+            "weight": 4.3499999,
+            "weight_uom": "LB",
+            "width": 16
+          }
+        ],
+        "sku": "678905"
+      }
+    ]
+  }
+}

@@ -1,0 +1,57 @@
+MERGE INTO
+  `elm_datamart.intraday` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.intraday`
+WHERE
+    intraday_date BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 14 DAY) AND CURRENT_DATE()) AS src
+ON
+  dest.id = src.id and
+  dest.facility_id = src.facility_id
+  WHEN MATCHED AND dest.created != src.created THEN UPDATE SET client_id = src.client_id, facility_id= src.facility_id, item_number= src.item_number, intraday_timestamp= src.intraday_timestamp, sequence= src.sequence, intraday_date= src.intraday_date, year_num= src.year_num, month_num= src.month_num, day_num= src.day_num, week_num= src.week_num, month_name= src.month_name, day_name= src.day_name, client= src.client, facility= src.facility, department= src.department, process= src.process, process_code= src.process_code, employee= src.employee, employee_code= src.employee_code, shift= src.shift, supervisor= src.supervisor, category= src.category, goal= src.goal, duration= src.duration, unadjusted_duration= src.unadjusted_duration, els= src.els, isindirect= src.isindirect, isbillable= src.isbillable, ismissing_time= src.ismissing_time, isgap_time= src.isgap_time, isgap_time_applied= src.isgap_time_applied, metrics=src.metrics, created= src.created, created_by= src.created_by, metrics_json= src.metrics_json, bq_update_ts= CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  (id,
+    client_id,
+    facility_id,
+    item_number,
+    intraday_timestamp,
+    sequence,
+    intraday_date,
+    year_num,
+    month_num,
+    day_num,
+    week_num,
+    month_name,
+    day_name,
+    client,
+    facility,
+    department,
+    process,
+    process_code,
+    employee,
+    employee_code,
+    shift,
+    supervisor,
+    category,
+    goal,
+    duration,
+    unadjusted_duration,
+    els,
+    isindirect,
+    isbillable,
+    ismissing_time,
+    isgap_time,
+    isgap_time_applied,
+    metrics,
+    created,
+    created_by,
+    metrics_json,
+    bq_create_ts,
+    bq_update_ts)
+VALUES
+  (src.id, src.client_id, src.facility_id, src.item_number, src.intraday_timestamp, src.sequence,  src.intraday_date, src.year_num, src.month_num, src.day_num, src.week_num, src.month_name, src.day_name, src.client, src.facility, src.department, src.process, src.process_code, src.employee, src.employee_code, src.shift, src.supervisor, src.category, src.goal, src.duration, src.unadjusted_duration, src.els, src.isindirect, src.isbillable, src.ismissing_time, src.isgap_time, src.isgap_time_applied, src.metrics, src.created, src.created_by, src.metrics_json, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.0.5'
+	id 'org.springframework.boot' version '3.3.2'
 	id 'io.spring.dependency-management' version '1.1.0'
 	id 'jacoco'
 	id 'maven-publish'
@@ -68,14 +68,16 @@ repositories {
 ext {
 	set('springCloudGcpVersion', "4.5.1")
 	set('springCloudVersion', "2020.0.3")
+	set('springFrameworkVersion', "6.2.1")
 }
 
 dependencies {
 
 	//Spring
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.integration:spring-integration-core:6.2.0'
+	implementation "org.springframework.integration:spring-integration-core:${springFrameworkVersion}"
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	//Spring Cloud GCP Dependencies
 	implementation 'com.google.cloud:spring-cloud-gcp-autoconfigure'
@@ -89,7 +91,20 @@ dependencies {
 
 	//JSON,File,IO related
 	implementation 'com.networknt:json-schema-validator:1.0.72'
-	implementation 'commons-io:commons-io:2.11.0'
+	implementation 'commons-io:commons-io:2.16.1'
+
+	//Upgrade vulnerable dependencies version
+	implementation 'org.apache.commons:commons-compress:1.26.0'
+	implementation "org.springframework:spring-core:${springFrameworkVersion}"
+	implementation "org.springframework:spring-beans:${springFrameworkVersion}"
+	implementation "org.springframework:spring-expression:${springFrameworkVersion}"
+	implementation "org.springframework:spring-context:${springFrameworkVersion}"
+	implementation "org.springframework:spring-webmvc:${springFrameworkVersion}"
+	implementation "org.springframework:spring-web:${springFrameworkVersion}"
+	implementation 'io.netty:netty-common:4.1.115.Final'
+	implementation 'com.google.guava:guava:33.2.1-jre'
+	implementation 'com.google.protobuf:protobuf-java:4.28.2'
+	implementation 'org.json:json:20240205'
 
 	//Lombok
 	compileOnly 'org.projectlombok:lombok'
@@ -97,10 +112,13 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	//OSC-R2R-Commons
+	implementation('com.homedepot.osc.run2run:osc-run2run-commons:1.4.1')
 
 	//Test
+	testImplementation 'org.xmlunit:xmlunit-core:2.10.0'
 	testImplementation 'org.mockito:mockito-inline:2.13.0'
-	testImplementation 'org.testcontainers:junit-jupiter:1.19.1'
+	testImplementation 'org.testcontainers:junit-jupiter:1.19.2'
 	testImplementation 'javax.inject:javax.inject:1'
 	testImplementation 'org.testcontainers:gcloud:1.19.1'
 	testImplementation ('org.springframework.boot:spring-boot-starter-test') {
@@ -157,6 +175,12 @@ jacocoTestReport {
 
 	reports {
 		xml.required = true
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: 'com/homedepot/supplychain/enterpriselabormanagement/EnterpriseLaborManagementApplication.class')
+		}))
 	}
 }
 

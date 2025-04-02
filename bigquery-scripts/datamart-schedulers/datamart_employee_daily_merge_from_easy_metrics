@@ -1,0 +1,54 @@
+MERGE INTO
+  `elm_datamart.employee` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.employee`
+) AS src
+ON
+  dest.employee_id = src.employee_id and
+  dest.facility_id= src.facility_id and
+  dest.effective_date = src.effective_date
+  WHEN MATCHED AND dest.updated != src.updated THEN UPDATE SET client_id= src.client_id, client_name= src.client_name, facility_id= src.facility_id, facility_name= src.facility_name, employee_id= src.employee_id, last_name= src.last_name, first_name= src.first_name, employee_code= src.employee_code, effective_date= src.effective_date, isactive= src.isactive, start_date= src.start_date, hourly_wage= src.hourly_wage, iseligible= src.iseligible, iseligible_ot= src.iseligible_ot, donotimport= src.donotimport, default_shift_name= src.default_shift_name, missing_time_process_name= src.missing_time_process_name, employee_type_name= src.employee_type_name, employee_type_std_code= src.employee_type_std_code, employee_type_status_quo_indirect= src.employee_type_status_quo_indirect, employee_type_status_quo_missing= src.employee_type_status_quo_missing, employee_type_bonus_load= src.employee_type_bonus_load, employee_type_labor_burden= src.employee_type_labor_burden, supervisor_employee_id= src.supervisor_employee_id, supervisor_last_name= src.supervisor_last_name, supervisor_first_name= src.supervisor_first_name, supervisor_employee_code= src.supervisor_employee_code, supervisor_status_quo_indirect= src.supervisor_status_quo_indirect, supervisor_status_quo_missing= src.supervisor_status_quo_missing, created= src.created, updated= src.updated, created_by= src.created_by, updated_by = src.updated_by, bq_update_ts= CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  (client_id,
+    client_name,
+    facility_id,
+    facility_name,
+    employee_id,
+    last_name,
+    first_name,
+    employee_code,
+    effective_date,
+    isactive,
+    start_date,
+    hourly_wage,
+    iseligible,
+    iseligible_ot,
+    donotimport,
+    default_shift_name,
+    missing_time_process_name,
+    employee_type_name,
+    employee_type_std_code,
+    employee_type_status_quo_indirect,
+    employee_type_status_quo_missing,
+    employee_type_bonus_load,
+    employee_type_labor_burden,
+    supervisor_employee_id,
+    supervisor_last_name,
+    supervisor_first_name,
+    supervisor_employee_code,
+    supervisor_status_quo_indirect,
+    supervisor_status_quo_missing,
+    created,
+    updated,
+    created_by,
+    updated_by,
+    bq_create_ts,
+    bq_update_ts)
+VALUES
+  (src.client_id, src.client_name, src.facility_id, src.facility_name, src.employee_id, src.last_name, src.first_name, src.employee_code, src.effective_date, src.isactive, src.start_date, src.hourly_wage, src.iseligible, src.iseligible_ot, src.donotimport, src.default_shift_name, src.missing_time_process_name, src.employee_type_name, src.employee_type_std_code, src.employee_type_status_quo_indirect, src.employee_type_status_quo_missing, src.employee_type_bonus_load, src.employee_type_labor_burden, src.supervisor_employee_id, src.supervisor_last_name, src.supervisor_first_name, src.supervisor_employee_code, src.supervisor_status_quo_indirect, src.supervisor_status_quo_missing, src.created, src.updated, src.created_by, src.updated_by, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

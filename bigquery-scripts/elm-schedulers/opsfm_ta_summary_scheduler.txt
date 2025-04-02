@@ -1,0 +1,118 @@
+WITH
+  PUNCH_PPL_TEMP AS (
+  SELECT
+    DISTINCT PUNCH.partitionDate AS punch_date,
+    PUNCH.personId AS PERSON_ID,
+    PUNCH.orderNumber,
+    PUNCH.startDateTime AS Punch_StartDTM,
+    PUNCH.endDateTime AS Punch_EndDTM,
+    PUNCH.segmentTypeId,
+    PPL.userName AS LDAP_ID,
+    CONCAT(COALESCE(PPL.lastName, ''), ", ", COALESCE(PPL.firstName, ''), " ", COALESCE(PPL.middleName, '')) AS Full_Name,
+    PPL.timeZone,
+    LEFT(groupSchedule, 4) AS DC_NUMBER,
+    DPR.punchReason AS PUNCH_REASON
+  FROM
+    `pr-hr-wfm-services.thd_pr_sharedviews.vwTimeCardProcessSegments` PUNCH
+  JOIN
+    `pr-hr-wfm-services.thd_pr_sharedviews.vwPeople` PPL
+  ON
+    PUNCH.personId = PPL.personId
+  LEFT JOIN
+    `pr-hr-wfm-services.thd_pr_sharedviews.vwDimPunchReason` AS DPR
+  ON
+    PUNCH.segmentTypeId = DPR.segmentTypeId
+  WHERE
+    LEFT(groupSchedule, 4) IN ('5853',
+      '5987',
+      '5897',
+      '5898',
+      '5840',
+      '5824',
+      '5914',
+      '5865',
+      '5856',
+      '5977',
+      '5928',
+      '5830',
+      '5859',
+      '5955',
+      '5942',
+      '5943',
+      '5978')
+    AND PUNCH.partitionDate BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY)
+    AND CURRENT_DATE() )
+SELECT
+  adjusted_punches.LDAP_ID AS USER_ID,
+  adjusted_punches.Full_Name AS USER_NAME,
+  adjusted_punches.punch_date AS PUNCH_DATE,
+  adjusted_punches.total_hours AS TOTAL_HOURS,
+  ROUND(COALESCE(SUM(M_Act_Paid_Hrs), 0),2) AS OT_WORKED,
+  adjusted_punches.DC_NUMBER
+FROM (
+  SELECT
+    punch_groups.LDAP_ID,
+    punch_groups.PERSON_ID,
+    punch_groups.Full_Name,
+    MIN(punch_groups.punch_date) AS punch_date,
+    punch_groups.DC_NUMBER,
+    -- Compute the labor hours from start time and end time of the punch
+    ROUND(SUM(TIMESTAMP_DIFF(punch_groups.Punch_EndDTM, punch_groups.Punch_StartDTM, MINUTE))/60, 2) AS total_hours,
+  FROM (
+    SELECT
+      punch_start_sequence.LDAP_ID,
+      punch_start_sequence.PERSON_ID,
+      punch_start_sequence.Full_Name,
+      punch_start_sequence.punch_date,
+      punch_start_sequence.Punch_StartDTM,
+      punch_start_sequence.Punch_EndDTM,
+      punch_start_sequence.orderNumber,
+      punch_start_sequence.DC_NUMBER,
+      -- Increment the group no: for every new set of punch orderNumbers
+      SUM(punch_start_sequence.reset_flag) OVER (PARTITION BY punch_start_sequence.LDAP_ID ORDER BY punch_start_sequence.punch_date, punch_start_sequence.Punch_StartDTM, punch_start_sequence.orderNumber) AS Grp
+    FROM (
+      SELECT
+        PP.LDAP_ID,
+        PP.PERSON_ID,
+        PP.Full_Name,
+        PP.punch_date,
+        PP.Punch_StartDTM,
+        PP.Punch_EndDTM,
+        PP.orderNumber,
+        PP.timeZone,
+        PP.PUNCH_REASON,
+        PP.DC_NUMBER,
+        CASE
+          WHEN orderNumber = 1 THEN 1
+          ELSE 0
+      END
+        AS reset_flag
+      FROM
+        PUNCH_PPL_TEMP PP
+      WHERE
+        -- Condition to avoid breaks - REVISIT THE CONDITION
+        PP.PUNCH_REASON IS NULL
+        -- Condition to avoid future punches
+        AND TIMESTAMP(PP.Punch_StartDTM, SUBSTR(PP.timeZone, 6, 6 )) <= CURRENT_TIMESTAMP()
+        AND TIMESTAMP(PP.Punch_EndDTM, SUBSTR(PP.timeZone, 6, 6 )) <= CURRENT_TIMESTAMP()
+      ORDER BY
+        PP.punch_date,
+        PP.Punch_StartDTM ) AS punch_start_sequence ) AS punch_groups
+  GROUP BY
+    punch_groups.LDAP_ID,
+    punch_groups.PERSON_ID,
+    punch_groups.Full_Name,
+    punch_groups.DC_NUMBER,
+    grp) AS adjusted_punches
+LEFT JOIN
+  `pr-hr-wfm-services.thd_pr_sharedviews.vwVKronosDaySummary` SMRY
+ON
+  (adjusted_punches.person_id = SMRY.Person_personId)
+  AND adjusted_punches.punch_date = SMRY.Date_PartitionDate
+  AND SMRY.PC_payCodeName = 'OVERTIME'
+GROUP BY
+  1,
+  2,
+  3,
+  4,
+  6

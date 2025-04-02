@@ -1,0 +1,1 @@
+SELECT * FROM elm_integration.elm_integration_raw_messages where JSON_VALUE(data, '$.laborEvent.trace_id')='a40f302dbec6b096d8d803f66406b6fc';

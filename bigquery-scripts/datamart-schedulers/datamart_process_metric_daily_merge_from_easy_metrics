@@ -1,0 +1,39 @@
+MERGE INTO
+  `elm_datamart.process_metric` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.process_metric` ) AS src
+ON
+  dest.process_metric_id = src.process_metric_id
+  AND dest.facility_id = src.facility_id
+  AND dest.process_id = src.process_id
+  AND dest.effective_date = src.effective_date
+  WHEN MATCHED AND dest.updated != src.updated THEN UPDATE SET client_id= src.client_id, client_name= src.client_name, facility_id= src.facility_id, facility_name= src.facility_name, process_id= src.process_id, process_name= src.process_name, process_code= src.process_code, metric_name= src.metric_name, metric_sequence= src.metric_sequence, metric_value= src.metric_value, metric_std_code= src.metric_std_code, effective_date= src.effective_date, created= src.created, updated= src.updated, created_by= src.created_by, updated_by= src.updated_by, iscosting= src.iscosting, bq_update_ts= CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  (client_id,
+    client_name,
+    facility_id,
+    facility_name,
+    process_id,
+    process_name,
+    process_code,
+    process_metric_id,
+    metric_name,
+    metric_sequence,
+    metric_value,
+    metric_std_code,
+    effective_date,
+    created,
+    updated,
+    created_by,
+    updated_by,
+    iscosting,
+    bq_create_ts,
+    bq_update_ts)
+VALUES
+  (src.client_id, src.client_name, src.facility_id, src.facility_name, src.process_id, src.process_name, src.process_code, src.process_metric_id, src.metric_name, src.metric_sequence, src.metric_value, src.metric_std_code, src.effective_date, src.created, src.updated, src.created_by, src.updated_by, src.iscosting, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

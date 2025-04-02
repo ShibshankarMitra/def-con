@@ -1,5 +1,5 @@
 {
-  "attributes": {
+  "laborEvent": {
     "schemaUrl": "<insert schema url>",
     "contract_version": "0.1",
     "source": "HDW",
@@ -12,7 +12,7 @@
     "trace_id": "6e0ed4f6-00c8-4676-8a4a-529c0a713833",
     "task_id": "10979301"
   },
-  "data": {
+  "laborEventDetail": {
     "user_id": "john_smith@homedepot.com",
     "ldap_id": "stc9000",
     "transaction_id": "6e0ed4f6-00c8-4676-8a4a-529c0a713834",
@@ -40,22 +40,22 @@
               {
                 "sku_number": "1007098445",
                 "build_id": "9ccb23d1-c1d0-4705-a721-3129b16e84e9",
-                "sku_description": "1X12-8FT PRIMED FJ S4S BOARD",
                 "department": "11",
                 "sku_class": "22",
                 "sku_sub_class": "33",
+                "quantity": "28",
+                "sku_description": "1X12-8FT PRIMED FJ S4S BOARD",
                 "special_handling": "",
                 "build_on_method": "",
                 "secure_method": "",
-                "unload_type": ""
+                "unload_type": "",
+                "vendor_number": "43954"
               }
             ],
             "location_uom": "CA",
-            "location_qty": "28",
             "uom_qty": "68",
             "reason_code": "",
             "inbound_outbound_indicator": "O",
-            "vendor_number": "43954",
             "lpn_status": "",
             "mhe_loaded": "N"
           }

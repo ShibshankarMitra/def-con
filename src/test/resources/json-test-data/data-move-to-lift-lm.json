@@ -1,0 +1,126 @@
+{
+  "laborEvent": {
+    "schemaUrl": "https://thd.atlassian.net/wiki/spaces/SCD/pages/2400094559/HDW-ELM+Event+Json+Schema",
+    "contract_version": "0.1",
+    "source": "HDW",
+    "platform": "SDC",
+    "dc_number": "9002",
+    "activity": "MOVE_TO_LIFT_LM",
+    "action": "MOVE_TO_LIFT_LM",
+    "event_type": "DIRECT",
+    "publish_timestamp": "2024-09-27T17:33:45.246",
+    "trace_id": "abbd5d8af457c63a3ee3c89f399bb24d"
+  },
+  "laborEventDetail": {
+    "user_id": "testToken_eea095f769b441d5b53696f4c1f869af@homedepot.com",
+    "ldap_id": "testtoken",
+    "transaction_id": "12400227195140703",
+    "lpns": [
+      {
+        "container_type": "",
+        "locations": [
+          {
+            "end_location": "BO3-508-551-197",
+            "end_location_type": "STG",
+            "end_zone": "BO3",
+            "inbound_outbound_indicator": "I",
+            "location_qty": "",
+            "location_uom": "PL",
+            "lpn_status": "",
+            "mhe_loaded": "Y",
+            "order_category": "INBOUND",
+            "pick_area": "BI2",
+            "put_area": "BI2",
+            "rail_car_number": "",
+            "reason_code": "",
+            "scac": "",
+            "service_type": "",
+            "shipment_lpn_error_type": "",
+            "shipment_number": "",
+            "shipment_route": "",
+            "shipment_stop": "",
+            "shipment_type_id": "",
+            "skus": [
+              {
+                "build_id": "f1943cc7-f27e-4999-b277-4383386b7770",
+                "build_on_method": "",
+                "sku_class": "35",
+                "department": "35",
+                "secure_method": "",
+                "sku_description": "",
+                "sku_number": "1580724440",
+                "special_handling": "",
+                "sku_sub_class": "75",
+                "unload_type": "",
+                "quantity": "10",
+                "vendor_number": "99999"
+              }
+            ],
+            "start_location": "BO3-508-551-197",
+            "start_location_type": "STG",
+            "start_zone": "BO3",
+            "store_number": "",
+            "trailer_number": "2694709383",
+            "transaction_timestamp": "2024-09-27T17:33:44.997",
+            "uom_qty": "0",
+            "vendor_number": ""
+          }
+        ],
+        "lpn_number": "L00009597339",
+        "parent_lpn_id": ""
+      }
+    ],
+    "builds": [
+      {
+        "build_id": "f1943cc7-f27e-4999-b277-4383386b7770",
+        "package_hierarchy": [
+          {
+            "depth": 57.0,
+            "height": 22.0,
+            "hierarchy_level_code": "CA",
+            "package_each_qty": "5",
+            "package_unit_qty": "5",
+            "size_uom": "IN",
+            "weight": 27.0,
+            "weight_uom": "LB",
+            "width": 72.0
+          },
+          {
+            "depth": 24.0,
+            "height": 10.0,
+            "hierarchy_level_code": "PK",
+            "package_each_qty": "2",
+            "package_unit_qty": "5",
+            "size_uom": "IN",
+            "weight": 12.0,
+            "weight_uom": "LB",
+            "width": 30.0
+          },
+          {
+            "depth": 86.0,
+            "height": 93.0,
+            "hierarchy_level_code": "PL",
+            "package_each_qty": "10",
+            "package_unit_qty": "2",
+            "size_uom": "IN",
+            "weight": 252.0,
+            "weight_uom": "LB",
+            "width": 100.0
+          },
+          {
+            "depth": 11.0,
+            "height": 4.0,
+            "hierarchy_level_code": "EA",
+            "package_each_qty": "1",
+            "package_unit_qty": "1",
+            "size_uom": "IN",
+            "weight": 5.0,
+            "weight_uom": "LB",
+            "width": 14.0
+          }
+        ],
+        "sku": "1580724440"
+      }
+    ]
+  }
+}

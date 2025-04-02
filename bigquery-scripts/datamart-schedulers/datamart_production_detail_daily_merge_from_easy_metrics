@@ -1,0 +1,74 @@
+MERGE INTO
+  `elm_datamart.production_detail` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.production_detail`
+WHERE
+    item_date BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 14 DAY) AND CURRENT_DATE()
+) AS src
+ON
+  dest.facility_id = src.facility_id
+  and dest.item_id = src.item_id
+  and dest.employee_id= src.employee_id
+  WHEN MATCHED AND dest.updated != src.updated THEN UPDATE SET id= src.id, client_id = src.client_id, facility_id= src.facility_id, item_id= src.item_id, employee_id= src.employee_id, item_date= src.item_date, year_num= src.year_num, month_num= src.month_num, day_num= src.day_num, week_num= src.week_num, month_name= src.month_name, day_name= src.day_name, client= src.client, facility= src.facility, department= src.department, process= src.process, category= src.category, shift= src.shift, supervisor= src.supervisor, employee= src.employee, employee_code= src.employee_code, employee_type= src.employee_type, employee_hours= src.employee_hours, employee_marktime_hours= src.employee_marktime_hours, item_hours= src.item_hours, item_marktime_hours= src.item_marktime_hours, els= src.els, els_hours= src.els_hours, earned_hours= src.earned_hours, isdirect= src.isdirect, isindirect= src.isindirect, isbillable= src.isbillable, ismissing= src.ismissing, tiers= src.tiers, metrics=src.metrics, item_number= src.item_number, department_code= src.department_code, process_code= src.process_code, reference_id= src.reference_id, user_defined_1= src.user_defined_1, user_defined_2= src.user_defined_2, user_defined_3= src.user_defined_3, user_defined_4= src.user_defined_4, created= src.created, updated= src.updated, created_by= src.created_by, updated_by= src.updated_by, department_std_code= src.department_std_code, process_std_code= src.process_std_code, process_id= src.process_id, isthroughput= src.isthroughput, bq_update_ts = CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  (id,
+    client_id,
+    facility_id,
+    item_id,
+    employee_id,
+    item_date,
+    year_num,
+    month_num,
+    day_num,
+    week_num,
+    month_name,
+    day_name,
+    client,
+    facility,
+    department,
+    process,
+    category,
+    shift,
+    supervisor,
+    employee,
+    employee_code,
+    employee_type,
+    employee_hours,
+    employee_marktime_hours,
+    item_hours,
+    item_marktime_hours,
+    els,
+    els_hours,
+    earned_hours,
+    isdirect,
+    isindirect,
+    isbillable,
+    ismissing,
+    tiers,
+    metrics,
+    item_number,
+    department_code,
+    process_code,
+    reference_id,
+    user_defined_1,
+    user_defined_2,
+    user_defined_3,
+    user_defined_4,
+    created,
+    updated,
+    created_by,
+    updated_by,
+    department_std_code,
+    process_std_code,
+    process_id,
+    isthroughput,
+    bq_update_ts,
+    bq_create_ts )
+VALUES
+  (src.id, src.client_id, src.facility_id, src.item_id, src.employee_id, src.item_date, src.year_num, src.month_num, src.day_num, src.week_num, src.month_name, src.day_name, src.client, src.facility, src.department, src.process, src.category, src.shift, src.supervisor, src.employee, src.employee_code, src.employee_type, src.employee_hours, src.employee_marktime_hours, src.item_hours, src.item_marktime_hours, src.els, src.els_hours, src.earned_hours, src.isdirect, src.isindirect, src.isbillable, src.ismissing, src.tiers, src.metrics, src.item_number, src.department_code, src.process_code, src.reference_id, src.user_defined_1, src.user_defined_2, src.user_defined_3, src.user_defined_4, src.created, src.updated, src.created_by, src.updated_by, src.department_std_code, src.process_std_code, src.process_id, src.isthroughput, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

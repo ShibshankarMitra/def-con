@@ -4,8 +4,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.homedepot.supplychain.enterpriselabormanagement.exceptions.ElmSystemException;
 import com.homedepot.supplychain.enterpriselabormanagement.exceptions.ElmBusinessException;
+import com.homedepot.supplychain.enterpriselabormanagement.exceptions.ElmSystemException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,14 +37,13 @@ class ExceptionAspectTests {
     @Test
     void testInterceptForElmBusinessException() {
         //Execute interceptor
-        exceptionAspect.intercept(new ElmBusinessException("message_id", "error_message", new RuntimeException()));
+        exceptionAspect.intercept(new ElmBusinessException("error_message", new RuntimeException()));
         //Capture the Logs in the List
         List<ILoggingEvent> logsList = listAppender.list;
 
         //Assertions related to Logging Level and Logged Data
         Assertions.assertEquals(Level.ERROR, logsList.get(0)
                 .getLevel());
-        Assertions.assertTrue(logsList.get(0).getMessage().contains("PubSub_MessageID"));
         listAppender.stop();
     }
 

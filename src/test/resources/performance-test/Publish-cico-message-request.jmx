@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan: Pub/Sub with Auth API">
+      <stringProp name="TestPlan.comments">Publish multiple message in pub/sub topic</stringProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="TEST_DURATION" elementType="Argument">
+            <stringProp name="Argument.name">TEST_DURATION</stringProp>
+            <stringProp name="Argument.value">900</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="CLIENT_ID" elementType="Argument">
+            <stringProp name="Argument.name">CLIENT_ID</stringProp>
+            <stringProp name="Argument.value">764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="CLIENT_SECRET" elementType="Argument">
+            <stringProp name="Argument.name">CLIENT_SECRET</stringProp>
+            <stringProp name="Argument.value">d-FL95Q19q7MQmFpd7hHD0Ty</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="GRANT_TYPE" elementType="Argument">
+            <stringProp name="Argument.name">GRANT_TYPE</stringProp>
+            <stringProp name="Argument.value">refresh_token</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="REFRESH_TOKEN" elementType="Argument">
+            <stringProp name="Argument.name">REFRESH_TOKEN</stringProp>
+            <stringProp name="Argument.value">1//0gfnTiYdURXQmCgYIARAAGBASNwF-L9Ir0_iU6EK6zA56a7SSUKUxG2qIjPfALkxHcZ06dBamk76AwjKjnsBS9oBVSeMx-Y7cNZE</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="TOPIC_NAME" elementType="Argument">
+            <stringProp name="Argument.name">TOPIC_NAME</stringProp>
+            <stringProp name="Argument.value">elm_cico_transactions</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="DELAY_MS" elementType="Argument">
+            <stringProp name="Argument.name">DELAY_MS</stringProp>
+            <stringProp name="Argument.value">2000</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <stringProp name="ThreadGroup.duration">${TEST_DURATION}</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">stopthread</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="Message data">
+          <collectionProp name="UserParameters.names">
+            <stringProp name="1078179652">clock-in</stringProp>
+            <stringProp name="-936163057">clock-out</stringProp>
+            <stringProp name="1480290382">clock-in-shift-b</stringProp>
+            <stringProp name="-699529447">clock-out-shift-b</stringProp>
+            <stringProp name="0"></stringProp>
+          </collectionProp>
+          <collectionProp name="UserParameters.thread_values">
+            <collectionProp name="1667387538">
+              <stringProp name="1227574419">{     &quot;laborEvent&quot;: {         &quot;schemaUrl&quot;: &quot;&lt;insert schema url&gt;&quot;,         &quot;contract_version&quot;: &quot;0.1&quot;,         &quot;source&quot;: &quot;HDW&quot;,         &quot;event_type&quot;: &quot;CICO&quot;,         &quot;action&quot;: &quot;CICO_KIOSK&quot;,         &quot;activity&quot;: &quot;CLOCK_IN&quot;,         &quot;platform&quot;: &quot;FDC&quot;,         &quot;dc_number&quot;: &quot;5865&quot;,         &quot;publish_timestamp&quot;: &quot;2024-10-10T05:54:58.813&quot;,         &quot;trace_id&quot;: &quot;${__UUID()}&quot;     },     &quot;laborEventDetail&quot;: {         &quot;user_id&quot;: &quot;${userShiftA}@homedepot.com&quot;,         &quot;user_name&quot;: &quot;${userShiftA}&quot;,         &quot;ldap_id&quot;: &quot;stc9000&quot;,         &quot;transaction_id&quot;: &quot;ef23415ef78da234&quot;,         &quot;transaction_timestamp&quot;: &quot;2024-10-10T05:54:58.813&quot;,         &quot;transaction_local_timestamp&quot;: &quot;2024-10-10T09:54:58.813&quot;     } }</stringProp>
+              <stringProp name="1956117242">{     &quot;laborEvent&quot;: {         &quot;schemaUrl&quot;: &quot;&lt;insert schema url&gt;&quot;,         &quot;contract_version&quot;: &quot;0.1&quot;,         &quot;source&quot;: &quot;HDW&quot;,         &quot;event_type&quot;: &quot;CICO&quot;,         &quot;action&quot;: &quot;CICO_KIOSK&quot;,         &quot;activity&quot;: &quot;CLOCK_OUT&quot;,         &quot;platform&quot;: &quot;FDC&quot;,         &quot;dc_number&quot;: &quot;5865&quot;,         &quot;publish_timestamp&quot;: &quot;2024-10-10T13:59:58.813&quot;,         &quot;trace_id&quot;: &quot;${__UUID()}&quot;     },     &quot;laborEventDetail&quot;: {         &quot;user_id&quot;: &quot;${userShiftA}@homedepot.com&quot;,         &quot;user_name&quot;: &quot;${userShiftA}&quot;,         &quot;ldap_id&quot;: &quot;stc9000&quot;,         &quot;transaction_id&quot;: &quot;ef23415ef78da234&quot;,         &quot;transaction_timestamp&quot;: &quot;2024-10-10T13:59:58.813&quot;,         &quot;transaction_local_timestamp&quot;: &quot;2024-10-10T14:54:58.813&quot;     } }</stringProp>
+              <stringProp name="-316563587">{     &quot;laborEvent&quot;: {         &quot;schemaUrl&quot;: &quot;&lt;insert schema url&gt;&quot;,         &quot;contract_version&quot;: &quot;0.1&quot;,         &quot;source&quot;: &quot;HDW&quot;,         &quot;event_type&quot;: &quot;CICO&quot;,         &quot;action&quot;: &quot;CICO_KIOSK&quot;,         &quot;activity&quot;: &quot;CLOCK_IN&quot;,         &quot;platform&quot;: &quot;FDC&quot;,         &quot;dc_number&quot;: &quot;5865&quot;,         &quot;publish_timestamp&quot;: &quot;2024-10-11T12:54:58.813&quot;,         &quot;trace_id&quot;: &quot;${__UUID()}&quot;     },     &quot;laborEventDetail&quot;: {         &quot;user_id&quot;: &quot;${userShiftB}@homedepot.com&quot;,         &quot;user_name&quot;: &quot;${userShiftB}&quot;,         &quot;ldap_id&quot;: &quot;stc9000&quot;,         &quot;transaction_id&quot;: &quot;ef23415ef78da234&quot;,         &quot;transaction_timestamp&quot;: &quot;2024-10-11T12:54:58.813&quot;,         &quot;transaction_local_timestamp&quot;: &quot;2024-10-11T13:54:58.813&quot;     } }</stringProp>
+              <stringProp name="1983931742">{     &quot;laborEvent&quot;: {         &quot;schemaUrl&quot;: &quot;&lt;insert schema url&gt;&quot;,         &quot;contract_version&quot;: &quot;0.1&quot;,         &quot;source&quot;: &quot;HDW&quot;,         &quot;event_type&quot;: &quot;CICO&quot;,         &quot;action&quot;: &quot;CICO_KIOSK&quot;,         &quot;activity&quot;: &quot;CLOCK_OUT&quot;,         &quot;platform&quot;: &quot;FDC&quot;,         &quot;dc_number&quot;: &quot;5865&quot;,         &quot;publish_timestamp&quot;: &quot;2024-10-12T01:54:58.813&quot;,         &quot;trace_id&quot;: &quot;${__UUID()}&quot;     },     &quot;laborEventDetail&quot;: {         &quot;user_id&quot;: &quot;${userShiftB}@homedepot.com&quot;,         &quot;user_name&quot;: &quot;${userShiftB}&quot;,         &quot;ldap_id&quot;: &quot;stc9000&quot;,         &quot;transaction_id&quot;: &quot;ef23415ef78da234&quot;,         &quot;transaction_timestamp&quot;: &quot;2024-10-12T01:54:58.813&quot;,         &quot;transaction_local_timestamp&quot;: &quot;2024-10-12T03:54:58.813&quot;     } }</stringProp>
+              <stringProp name="0"></stringProp>
+            </collectionProp>
+            <collectionProp name="-1836788680">
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+            </collectionProp>
+            <collectionProp name="-1836788680">
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+            </collectionProp>
+          </collectionProp>
+          <boolProp name="UserParameters.per_iteration">false</boolProp>
+          <stringProp name="TestPlan.comments">Message data variable</stringProp>
+        </UserParameters>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="TestPlan.comments">View overall summary report of Test plan</stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="AUTH_TOKEN_LC">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <stringProp name="TestPlan.comments">It controls the execution of API Requests</stringProp>
+        </LoopController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Access Token Request" enabled="true">
+            <stringProp name="HTTPSampler.domain">oauth2.googleapis.com</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.path">/token</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="client_id" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">${CLIENT_ID}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">client_id</stringProp>
+                </elementProp>
+                <elementProp name="client_secret" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">${CLIENT_SECRET}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">client_secret</stringProp>
+                </elementProp>
+                <elementProp name="grant_type" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">${GRANT_TYPE}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">grant_type</stringProp>
+                </elementProp>
+                <elementProp name="refresh_token" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">true</boolProp>
+                  <stringProp name="Argument.value">${REFRESH_TOKEN}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">refresh_token</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Access Token" enabled="true">
+              <stringProp name="JSONPostProcessor.referenceNames">token</stringProp>
+              <stringProp name="JSONPostProcessor.jsonPathExprs">$.access_token</stringProp>
+              <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
+            </JSONPostProcessor>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Text Validation: access_token" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="-1938933922">access_token</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+          <RunTime guiclass="RunTimeGui" testclass="RunTime" testname="PUBLISH_MESSAGES_ RC" enabled="true">
+            <stringProp name="RunTime.seconds">3599</stringProp>
+            <stringProp name="TestPlan.comments">It controls the execution of Publish Message API upto given seconds</stringProp>
+          </RunTime>
+          <hashTree>
+            <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="RANDOM USER SHIFT A" enabled="true">
+              <intProp name="ThroughputController.style">0</intProp>
+              <boolProp name="ThroughputController.perThread">false</boolProp>
+              <intProp name="ThroughputController.maxThroughput">1</intProp>
+              <FloatProperty>
+                <name>ThroughputController.percentThroughput</name>
+                <value>40.0</value>
+                <savedValue>0.0</savedValue>
+              </FloatProperty>
+              <stringProp name="TestPlan.comments">Publish Direct type of message into pub/sub topic</stringProp>
+            </ThroughputController>
+            <hashTree>
+              <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="${__RandomString(5,abcdefghijklmnopqrstuvwxyz,userShiftA)}">
+                <boolProp name="displayJMeterProperties">false</boolProp>
+                <boolProp name="displayJMeterVariables">false</boolProp>
+                <boolProp name="displaySystemProperties">false</boolProp>
+                <stringProp name="TestPlan.comments">Generate random String</stringProp>
+              </DebugSampler>
+              <hashTree/>
+              <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="CLOCK_IN_SHIFT_A" enabled="true">
+                <intProp name="ThroughputController.style">0</intProp>
+                <boolProp name="ThroughputController.perThread">false</boolProp>
+                <intProp name="ThroughputController.maxThroughput">1</intProp>
+                <FloatProperty>
+                  <name>ThroughputController.percentThroughput</name>
+                  <value>40.0</value>
+                  <savedValue>40.0</savedValue>
+                </FloatProperty>
+                <stringProp name="TestPlan.comments">Publish Direct type of message into pub/sub topic</stringProp>
+              </ThroughputController>
+              <hashTree>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Clock In" enabled="true">
+                  <stringProp name="TestPlan.comments">Publish Direct type of message into Pub/Sub topic</stringProp>
+                  <stringProp name="HTTPSampler.domain">pubsub.googleapis.com</stringProp>
+                  <stringProp name="HTTPSampler.protocol">https</stringProp>
+                  <stringProp name="HTTPSampler.path">/v1/projects/np-sc-distribution/topics/${TOPIC_NAME}:publish</stringProp>
+                  <stringProp name="HTTPSampler.method">POST</stringProp>
+                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                  <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                    <collectionProp name="Arguments.arguments">
+                      <elementProp name="" elementType="HTTPArgument">
+                        <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                        <stringProp name="Argument.value">{&#xd;
+  &quot;messages&quot;: [&#xd;
+    {&#xd;
+      &quot;data&quot;: &quot;${__base64Encode(${clock-in})}&quot;      &#xd;
+    }&#xd;
+  ]&#xd;
+}</stringProp>
+                        <stringProp name="Argument.metadata">=</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </elementProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                  <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+                    <collectionProp name="HeaderManager.headers">
+                      <elementProp name="" elementType="Header">
+                        <stringProp name="Header.name">Authorization</stringProp>
+                        <stringProp name="Header.value">Bearer ${token}</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </HeaderManager>
+                  <hashTree/>
+                </hashTree>
+              </hashTree>
+              <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="CLOCK_OUT_SHIFT_A">
+                <intProp name="ThroughputController.style">0</intProp>
+                <boolProp name="ThroughputController.perThread">false</boolProp>
+                <intProp name="ThroughputController.maxThroughput">1</intProp>
+                <FloatProperty>
+                  <name>ThroughputController.percentThroughput</name>
+                  <value>20.0</value>
+                  <savedValue>0.0</savedValue>
+                </FloatProperty>
+                <stringProp name="TestPlan.comments">Publish Direct type of message into pub/sub topic</stringProp>
+              </ThroughputController>
+              <hashTree>
+                <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer">
+                  <stringProp name="ConstantTimer.delay">${DELAY_MS}</stringProp>
+                  <stringProp name="TestPlan.comments">delay</stringProp>
+                </ConstantTimer>
+                <hashTree/>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Clock Out">
+                  <stringProp name="TestPlan.comments">Publish Direct type of message into Pub/Sub topic</stringProp>
+                  <stringProp name="HTTPSampler.domain">pubsub.googleapis.com</stringProp>
+                  <stringProp name="HTTPSampler.protocol">https</stringProp>
+                  <stringProp name="HTTPSampler.path">/v1/projects/np-sc-distribution/topics/${TOPIC_NAME}:publish</stringProp>
+                  <stringProp name="HTTPSampler.method">POST</stringProp>
+                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                  <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                    <collectionProp name="Arguments.arguments">
+                      <elementProp name="" elementType="HTTPArgument">
+                        <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                        <stringProp name="Argument.value">{&#xd;
+  &quot;messages&quot;: [&#xd;
+    {&#xd;
+      &quot;data&quot;: &quot;${__base64Encode(${clock-out})}&quot;      &#xd;
+    }&#xd;
+  ]&#xd;
+}</stringProp>
+                        <stringProp name="Argument.metadata">=</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </elementProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                  <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+                    <collectionProp name="HeaderManager.headers">
+                      <elementProp name="" elementType="Header">
+                        <stringProp name="Header.name">Authorization</stringProp>
+                        <stringProp name="Header.value">Bearer ${token}</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </HeaderManager>
+                  <hashTree/>
+                </hashTree>
+              </hashTree>
+            </hashTree>
+            <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="RANDOM USER SHIFT B">
+              <intProp name="ThroughputController.style">0</intProp>
+              <boolProp name="ThroughputController.perThread">false</boolProp>
+              <intProp name="ThroughputController.maxThroughput">1</intProp>
+              <FloatProperty>
+                <name>ThroughputController.percentThroughput</name>
+                <value>40.0</value>
+                <savedValue>40.0</savedValue>
+              </FloatProperty>
+              <stringProp name="TestPlan.comments">Publish Direct type of message into pub/sub topic</stringProp>
+            </ThroughputController>
+            <hashTree>
+              <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="${__RandomString(5,abcdefghijklmnopqrstuvwxyz,userShiftB)}" enabled="true">
+                <boolProp name="displayJMeterProperties">false</boolProp>
+                <boolProp name="displayJMeterVariables">false</boolProp>
+                <boolProp name="displaySystemProperties">false</boolProp>
+                <stringProp name="TestPlan.comments">Generate random String</stringProp>
+              </DebugSampler>
+              <hashTree/>
+              <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="CLOCK_IN_SHIFT_B" enabled="true">
+                <intProp name="ThroughputController.style">0</intProp>
+                <boolProp name="ThroughputController.perThread">false</boolProp>
+                <intProp name="ThroughputController.maxThroughput">1</intProp>
+                <FloatProperty>
+                  <name>ThroughputController.percentThroughput</name>
+                  <value>1.0</value>
+                  <savedValue>0.0</savedValue>
+                </FloatProperty>
+                <stringProp name="TestPlan.comments">Publish Direct type of message into pub/sub topic</stringProp>
+              </ThroughputController>
+              <hashTree>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Clock In Shift B" enabled="true">
+                  <stringProp name="TestPlan.comments">Publish Direct type of message into Pub/Sub topic</stringProp>
+                  <stringProp name="HTTPSampler.domain">pubsub.googleapis.com</stringProp>
+                  <stringProp name="HTTPSampler.protocol">https</stringProp>
+                  <stringProp name="HTTPSampler.path">/v1/projects/np-sc-distribution/topics/${TOPIC_NAME}:publish</stringProp>
+                  <stringProp name="HTTPSampler.method">POST</stringProp>
+                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                  <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                    <collectionProp name="Arguments.arguments">
+                      <elementProp name="" elementType="HTTPArgument">
+                        <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                        <stringProp name="Argument.value">{&#xd;
+  &quot;messages&quot;: [&#xd;
+    {&#xd;
+      &quot;data&quot;: &quot;${__base64Encode(${clock-in-shift-b})}&quot;&#xd;
+    }&#xd;
+  ]&#xd;
+}</stringProp>
+                        <stringProp name="Argument.metadata">=</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </elementProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                  <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+                    <collectionProp name="HeaderManager.headers">
+                      <elementProp name="" elementType="Header">
+                        <stringProp name="Header.name">Authorization</stringProp>
+                        <stringProp name="Header.value">Bearer ${token}</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </HeaderManager>
+                  <hashTree/>
+                </hashTree>
+              </hashTree>
+              <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="CLOCK_OUT_SHIFT_B" enabled="true">
+                <intProp name="ThroughputController.style">0</intProp>
+                <boolProp name="ThroughputController.perThread">false</boolProp>
+                <intProp name="ThroughputController.maxThroughput">1</intProp>
+                <FloatProperty>
+                  <name>ThroughputController.percentThroughput</name>
+                  <value>2.0</value>
+                  <savedValue>0.0</savedValue>
+                </FloatProperty>
+                <stringProp name="TestPlan.comments">Publish Indirect type of message into pub/sub topic</stringProp>
+              </ThroughputController>
+              <hashTree>
+                <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer">
+                  <stringProp name="ConstantTimer.delay">${DELAY_MS}</stringProp>
+                  <stringProp name="TestPlan.comments">delay</stringProp>
+                </ConstantTimer>
+                <hashTree/>
+                <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Clock Out Shift B">
+                  <stringProp name="TestPlan.comments">Publish Indirect type of message into Pub/Sub topic</stringProp>
+                  <stringProp name="HTTPSampler.domain">pubsub.googleapis.com</stringProp>
+                  <stringProp name="HTTPSampler.protocol">https</stringProp>
+                  <stringProp name="HTTPSampler.path">/v1/projects/np-sc-distribution/topics/${TOPIC_NAME}:publish</stringProp>
+                  <stringProp name="HTTPSampler.method">POST</stringProp>
+                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                  <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                    <collectionProp name="Arguments.arguments">
+                      <elementProp name="" elementType="HTTPArgument">
+                        <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                        <stringProp name="Argument.value">{&#xd;
+  &quot;messages&quot;: [    &#xd;
+    {&#xd;
+      &quot;data&quot;: &quot;${__base64Encode(${clock-out-shift-b})}&quot;      &#xd;
+    }&#xd;
+  ]&#xd;
+}</stringProp>
+                        <stringProp name="Argument.metadata">=</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </elementProp>
+                </HTTPSamplerProxy>
+                <hashTree>
+                  <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+                    <collectionProp name="HeaderManager.headers">
+                      <elementProp name="" elementType="Header">
+                        <stringProp name="Header.name">Authorization</stringProp>
+                        <stringProp name="Header.value">Bearer ${token}</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </HeaderManager>
+                  <hashTree/>
+                </hashTree>
+              </hashTree>
+            </hashTree>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

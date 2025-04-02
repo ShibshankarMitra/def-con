@@ -1,0 +1,63 @@
+MERGE INTO
+  `elm_datamart.budget` dest
+USING
+  (
+  SELECT
+    *
+  FROM
+    `easymetrics-gcp-1200000.data_1200000.budget`
+  -- WHERE
+  --   entry_date BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY) AND CURRENT_DATE()
+) AS src
+ON
+  dest.id = src.id
+  AND dest.facility_id = src.facility_id
+  WHEN MATCHED AND dest.updated != src.updated THEN UPDATE SET client_id = src.client_id, facility_id= src.facility_id, department_id= src.department_id, process_id= src.process_id, category_id= src.category_id, shift_id= src.shift_id, budget= src.budget, facility= src.facility, department= src.department, process= src.process, category= src.category, shift= src.shift, source= src.source, entry_description= src.entry_description, entry_type= src.entry_type, range_type= src.range_type, entry_date= src.entry_date, iscalculated= src.iscalculated, tiers= src.tiers, metrics= src.metrics, els= src.els, els_hours= src.els_hours, direct_hours= src.direct_hours, indirect_hours= src.indirect_hours, billable_hours= src.billable_hours, overtime_hours= src.overtime_hours, missing_hours= src.missing_hours, direct_labor_cost= src.direct_labor_cost, indirect_labor_cost= src.indirect_labor_cost, billable_labor_cost= src.billable_labor_cost, missing_hours_cost= src.missing_hours_cost, overtime_cost= src.overtime_cost, other_cost= src.other_cost, total_revenue=src.total_revenue, cost_units= src.cost_units, created= src.created, created_by= src.created_by, updated= src.updated, updated_by= src.updated_by, metrics_json= src.metrics_json, bq_update_ts= CURRENT_TIMESTAMP()
+  WHEN NOT MATCHED
+  THEN
+INSERT
+  (id,
+    client_id,
+    facility_id,
+    department_id,
+    process_id,
+    category_id,
+    shift_id,
+    budget,
+    facility,
+    department,
+    process,
+    category,
+    shift,
+    source,
+    entry_description,
+    entry_type,
+    range_type,
+    entry_date,
+    iscalculated,
+    tiers,
+    metrics,
+    els,
+    els_hours,
+    direct_hours,
+    indirect_hours,
+    billable_hours,
+    overtime_hours,
+    missing_hours,
+    direct_labor_cost,
+    indirect_labor_cost,
+    billable_labor_cost,
+    missing_hours_cost,
+    overtime_cost,
+    other_cost,
+    total_revenue,
+    cost_units,
+    created,
+    updated,
+    created_by,
+    updated_by,
+    metrics_json,
+    bq_create_ts,
+    bq_update_ts)
+VALUES
+  (src.id, src.client_id, src.facility_id, src.department_id, src.process_id, src.category_id, src.shift_id, src.budget, src.facility, src.department, src.process, src.category, src.shift, src.source, src.entry_description, src.entry_type, src.range_type, src.entry_date, src.iscalculated, src.tiers, src.metrics, src.els, src.els_hours, src.direct_hours, src.indirect_hours, src.billable_hours, src.overtime_hours, src.missing_hours, src.direct_labor_cost, src.indirect_labor_cost, src.billable_labor_cost, src.missing_hours_cost, src.overtime_cost, src.other_cost, src.total_revenue, src.cost_units, src.created, src.updated, src.created_by, src.updated_by, src.metrics_json, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());

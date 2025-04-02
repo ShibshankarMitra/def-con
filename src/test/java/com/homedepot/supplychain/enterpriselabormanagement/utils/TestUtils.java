@@ -1,6 +1,7 @@
 package com.homedepot.supplychain.enterpriselabormanagement.utils;
 
 import com.google.cloud.bigquery.*;
+import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,15 +17,17 @@ public final class TestUtils {
 
     public static final String TIMESTAMP_ZONE_APPENDER = "Z";
 
-    public static final List<String> ATTRIBUTE_OPTIONAL_FIELDS = List.of(TASK_ID);
+    public static final List<String> LABOR_EVENT_OPTIONAL_FIELDS = List.of(TASK_ID);
     public static final List<String> LPN_OPTIONAL_FIELDS = List.of(PARENT_LPN_ID, CONTAINER_TYPE);
     public static final List<String> LOCATION_OPTIONAL_FIELDS = List.of(PICK_AREA, PUT_AREA,
             REASON_CODE, ORDER_CATEGORY, SHIPMENT_NUMBER, SHIPMENT_TYPE_ID, SHIPMENT_ROUTE,
-            SHIPMENT_STOP, STORE_NUMBER, SERVICE_TYPE, VENDOR_NUMBER, TRAILER_NUMBER, SCAC, LPN_STATUS,
+            SHIPMENT_STOP, STORE_NUMBER, SERVICE_TYPE, TRAILER_NUMBER, SCAC, LPN_STATUS,
             SHIPMENT_LPN_ERROR_TYPE, MHE_LOADED);
     public static final List<String> SKU_OPTIONAL_FIELDS = List.of(
             SPECIAL_HANDLING, BUILD_ON_METHOD,
-            SECURE_METHOD, UNLOAD_TYPE);
+            SECURE_METHOD, UNLOAD_TYPE, VENDOR_NUMBER);
+    public static final String TRACE_ID_PATH = "$.laborEvent.trace_id";
+    public static final String DC_NUMBER_PATH = "$.laborEvent.dc_number";
 
     private TestUtils() {
         //Utils class
@@ -52,6 +55,8 @@ public final class TestUtils {
                 Field.of(VEHICLE_ID, StandardSQLTypeName.STRING),
                 Field.of(PARENT_LPN_ID, StandardSQLTypeName.STRING),
                 Field.of(LPN_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(CROSSDOCK, StandardSQLTypeName.BOOL),
+                Field.of(RECEIVING_TYPE, StandardSQLTypeName.STRING),
                 Field.of(CONTAINER_TYPE, StandardSQLTypeName.STRING),
                 Field.of(TRANSACTION_TIMESTAMP, StandardSQLTypeName.TIMESTAMP),
                 Field.of(START_LOCATION, StandardSQLTypeName.STRING),
@@ -63,6 +68,7 @@ public final class TestUtils {
                 Field.of(PICK_AREA, StandardSQLTypeName.STRING),
                 Field.of(PUT_AREA, StandardSQLTypeName.STRING),
                 Field.of(SKU_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(IS_MX, StandardSQLTypeName.BOOL),
                 Field.of(BUILD_ID, StandardSQLTypeName.STRING),
                 Field.of(SKU_DESCRIPTION, StandardSQLTypeName.STRING),
                 Field.of(DEPARTMENT, StandardSQLTypeName.STRING),
@@ -76,13 +82,16 @@ public final class TestUtils {
                 Field.of(WEIGHT_UOM, StandardSQLTypeName.STRING),
                 Field.of(SIZE_UOM, StandardSQLTypeName.STRING),
                 Field.of(PACKAGE_UNIT_QTY, StandardSQLTypeName.NUMERIC),
-                Field.of(PACKAGE_EACH_QTY, StandardSQLTypeName.NUMERIC),
+                Field.of(PACKAGE_EACH_QUANTITY, StandardSQLTypeName.NUMERIC),
+                Field.of(PACKAGE_PALLET_QUANTITY, StandardSQLTypeName.NUMERIC),
+                Field.of(PACKAGE_CASE_QUANTITY, StandardSQLTypeName.NUMERIC),
+                Field.of(PACKAGE_PACK_QUANTITY, StandardSQLTypeName.NUMERIC),
                 Field.of(SPECIAL_HANDLING, StandardSQLTypeName.STRING),
                 Field.of(BUILD_ON_METHOD, StandardSQLTypeName.STRING),
                 Field.of(SECURE_METHOD, StandardSQLTypeName.STRING),
                 Field.of(UNLOAD_TYPE, StandardSQLTypeName.STRING),
                 Field.of(LOCATION_UOM, StandardSQLTypeName.STRING),
-                Field.of(LOCATION_QTY, StandardSQLTypeName.NUMERIC),
+                Field.of(QUANTITY, StandardSQLTypeName.NUMERIC),
                 Field.of(UOM_QTY, StandardSQLTypeName.NUMERIC),
                 Field.of(REASON_CODE, StandardSQLTypeName.STRING),
                 Field.of(INBOUND_OUTBOUND_INDICATOR, StandardSQLTypeName.STRING),
@@ -99,8 +108,10 @@ public final class TestUtils {
                 Field.of(SCAC, StandardSQLTypeName.STRING),
                 Field.of(LPN_STATUS, StandardSQLTypeName.STRING),
                 Field.of(SHIPMENT_LPN_ERROR_TYPE, StandardSQLTypeName.STRING),
-                Field.of(MHE_LOADED, StandardSQLTypeName.STRING)
-        );
+                Field.of(MHE_LOADED, StandardSQLTypeName.STRING),
+                Field.of(ASN_VENDOR_NUMBER, StandardSQLTypeName.STRING),
+                Field.of(BUY_PACK_QUANTITY, StandardSQLTypeName.STRING)
+                );
     }
 
     public static String getSelectAllQuery(String datasetID, String tableName) {
@@ -112,21 +123,21 @@ public final class TestUtils {
         Map<String, String> row = new LinkedHashMap<>();
         JSONObject jsonObject = new JSONObject(jsonMessage);
 
-        //Mapping for attributes section
-        JSONObject attributes = jsonObject.getJSONObject("attributes");
-        row.put(CONTRACT_VERSION, attributes.getString(CONTRACT_VERSION));
-        row.put(SOURCE, attributes.getString(SOURCE));
-        row.put(EVENT_TYPE, attributes.getString(EVENT_TYPE));
-        row.put(PLATFORM, attributes.getString(PLATFORM));
-        row.put(DC_NUMBER, attributes.getString(DC_NUMBER));
-        row.put(ACTIVITY, attributes.getString(ACTIVITY));
-        row.put(ACTION, attributes.getString(ACTION));
-        row.put(TRACE_ID, attributes.getString(TRACE_ID));
-        row.put(PUBLISH_TIMESTAMP, attributes.getString(PUBLISH_TIMESTAMP));
-        ATTRIBUTE_OPTIONAL_FIELDS.forEach(optionalField -> {
-            if (attributes.has(optionalField)) {
+        //Mapping for laborEvent section
+        JSONObject laborEvent = jsonObject.getJSONObject("laborEvent");
+        row.put(CONTRACT_VERSION, laborEvent.getString(CONTRACT_VERSION));
+        row.put(SOURCE, laborEvent.getString(SOURCE));
+        row.put(EVENT_TYPE, laborEvent.getString(EVENT_TYPE));
+        row.put(PLATFORM, laborEvent.getString(PLATFORM));
+        row.put(DC_NUMBER, laborEvent.getString(DC_NUMBER));
+        row.put(ACTIVITY, laborEvent.getString(ACTIVITY));
+        row.put(ACTION, laborEvent.getString(ACTION));
+        row.put(TRACE_ID, laborEvent.getString(TRACE_ID));
+        row.put(PUBLISH_TIMESTAMP, laborEvent.getString(PUBLISH_TIMESTAMP));
+        LABOR_EVENT_OPTIONAL_FIELDS.forEach(optionalField -> {
+            if (laborEvent.has(optionalField)) {
                 try {
-                    row.put(optionalField, attributes.getString(optionalField));
+                    row.put(optionalField, laborEvent.getString(optionalField));
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -135,27 +146,28 @@ public final class TestUtils {
             }
         });
 
-        //Mapping for data section
-        JSONObject data = jsonObject.getJSONObject("data");
-        row.put(USER_ID, data.getString(USER_ID));
-        row.put(LDAP_ID, data.getString(LDAP_ID));
-        row.put(TRANSACTION_ID, data.getString(TRANSACTION_ID));
-        if (data.has("vehicle")) {
-            JSONObject vehicle = data.getJSONObject("vehicle");
+        //Mapping for laborEventDetail section
+        JSONObject laborEventDetail = jsonObject.getJSONObject("laborEventDetail");
+        row.put(USER_ID, laborEventDetail.getString(USER_ID));
+        row.put(LDAP_ID, laborEventDetail.getString(LDAP_ID));
+        row.put(TRANSACTION_ID, laborEventDetail.getString(TRANSACTION_ID));
+        if (laborEventDetail.has("vehicle")) {
+            JSONObject vehicle = laborEventDetail.getJSONObject("vehicle");
             row.put(VEHICLE_ID, vehicle.getString(VEHICLE_ID));
             row.put(ASSIGNED_VEHICLE, vehicle.getString(ASSIGNED_VEHICLE));
         }
-        if (data.has(TRANSACTION_TIMESTAMP)) {
-            row.put(TRANSACTION_TIMESTAMP, data.getString(TRANSACTION_TIMESTAMP));
+        if (laborEventDetail.has(TRANSACTION_TIMESTAMP)) {
+            row.put(TRANSACTION_TIMESTAMP, laborEventDetail.getString(TRANSACTION_TIMESTAMP));
         }
 
         //Mapping for Lpn section
-        if (data.has("lpns")) {
-            JSONArray lpnsJsonArray = data.getJSONArray("lpns");
+        if (laborEventDetail.has("lpns")) {
+            JSONArray lpnsJsonArray = laborEventDetail.getJSONArray("lpns");
             for (int i = 0; i < lpnsJsonArray.length(); i++) {
                 JSONObject lpn = lpnsJsonArray.getJSONObject(i);
 
                 row.put(LPN_NUMBER, lpn.getString(LPN_NUMBER));
+                row.put(RECEIVING_TYPE, lpn.optString(RECEIVING_TYPE));
                 LPN_OPTIONAL_FIELDS.forEach(optionalField -> {
                     if (lpn.has(optionalField)) {
                         try {
@@ -180,7 +192,6 @@ public final class TestUtils {
                     row.put(START_LOCATION_TYPE, location.getString(START_LOCATION_TYPE));
                     row.put(END_LOCATION_TYPE, location.getString(END_LOCATION_TYPE));
                     row.put(LOCATION_UOM, location.getString(LOCATION_UOM));
-                    row.put(LOCATION_QTY, location.getString(LOCATION_QTY));
                     row.put(UOM_QTY, location.getString(UOM_QTY));
                     row.put(INBOUND_OUTBOUND_INDICATOR, location.getString(INBOUND_OUTBOUND_INDICATOR));
                     LOCATION_OPTIONAL_FIELDS.forEach(optionalField -> {
@@ -206,6 +217,9 @@ public final class TestUtils {
                         row.put(DEPARTMENT, sku.getString(DEPARTMENT));
                         row.put(SKU_CLASS, sku.getString(SKU_CLASS));
                         row.put(SKU_SUB_CLASS, sku.getString(SKU_SUB_CLASS));
+                        row.put(QUANTITY, sku.getString(QUANTITY));
+                        row.put(BUY_PACK_QUANTITY, sku.optString(BUY_PACK_QUANTITY));
+                        row.put(ASN_VENDOR_NUMBER, sku.optString(ASN_VENDOR_NUMBER));
                         SKU_OPTIONAL_FIELDS.forEach(optionalField -> {
                             if (sku.has(optionalField)) {
                                 try {
@@ -254,8 +268,8 @@ public final class TestUtils {
     public static void validateR2RJsonPayloadAgainstHdw(String r2rPayload, String hdwPayload) throws JSONException {
         JSONObject r2rJsonObject = new JSONObject(r2rPayload);
         JSONObject hdwJsonObject = new JSONObject(hdwPayload);
-        String dc_number = hdwJsonObject.getJSONObject("attributes").getString(DC_NUMBER);
-        String trace_id = hdwJsonObject.getJSONObject("attributes").getString(TRACE_ID);
+        String dc_number = hdwJsonObject.getJSONObject("laborEvent").getString(DC_NUMBER);
+        String trace_id = hdwJsonObject.getJSONObject("laborEvent").getString(TRACE_ID);
         String transactionId = r2rJsonObject.getJSONObject("header").getString("transactionId");
         String locationId = r2rJsonObject.getJSONObject("header").getString("locationId");
         JSONArray entitiesJsonArray = r2rJsonObject.getJSONObject("body").getJSONArray("entities");
@@ -269,5 +283,9 @@ public final class TestUtils {
             log.info("Asserting not null transactionId={} from R2R message", transactionId);
             Assertions.assertNotNull(transactionId);
         }
+    }
+
+    public static String getJsonFieldValue(String messageBody, String jsonPath) {
+        return JsonPath.read(messageBody, jsonPath);
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AccessLevel;
 
 import java.util.List;
 @Getter
@@ -32,8 +33,6 @@ public class Location {
     private List<Sku> skus;
     @JsonProperty("location_uom")
     private String locationUom;
-    @JsonProperty("location_qty")
-    private double locationQty;
     @JsonProperty("uom_qty")
     private double uomQty;
     @JsonProperty("reason_code")
@@ -54,8 +53,6 @@ public class Location {
     private String storeNumber;
     @JsonProperty("service_type")
     private String serviceType;
-    @JsonProperty("vendor_number")
-    private String vendorNumber;
     @JsonProperty("trailer_number")
     private String trailerNumber;
     @JsonProperty("rail_car_number")
@@ -68,4 +65,12 @@ public class Location {
     private String shipmentLpnErrorType;
     @JsonProperty("mhe_loaded")
     private String mheLoaded;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @JsonProperty("location_qty")
+    private String locationQty;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @JsonProperty("vendor_number")
+    private String vendorNumber;
 }

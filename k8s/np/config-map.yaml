@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${artifact_name}-config
+  namespace: elm-integration
+  annotations:
+    strategy.spinnaker.io/versioned: 'false'
+data:
+  USER: ''
+  VERSION: ''
+
